@@ -135,10 +135,7 @@ t_list	*add_list(t_list *head, int num, int len)
 	list = NULL;
 	tmp = head;
 	if (!head)
-	{
 		head = create_list(num, 1, len);
-		tmp = head;
-	}
 	else
 	{
 		while (tmp->next && tmp->next->ishead != 1)
@@ -149,7 +146,32 @@ t_list	*add_list(t_list *head, int num, int len)
 		list->next = head;
 		head->prev = list;
 	}
+	printf("%s\n", "ra");
 	return (head);
+}
+
+t_list	*prev_list(t_list *head, int num, int len)
+{
+	t_list *tmp;
+	t_list *list;
+
+	list = NULL;
+	tmp = head;
+	if (!head)
+		list = create_list(num, 1, len);
+	else
+	{
+		while (tmp->next && tmp->next->ishead != 1)
+			tmp = tmp->next;
+		list = create_list(num, 1, len);
+		head->ishead = 0;
+		list->next = head;
+		list->prev = tmp;
+		tmp->next = list;
+		head->prev = list;
+	}
+	printf("%s\n", "pb");
+	return (list);
 }
 
 int minint(t_list *head)
@@ -168,46 +190,25 @@ int minint(t_list *head)
 	return (min);
 }
 
-int check(t_list *head, int min)
-{
-	t_list *tmp;
-	int i;
-
-	tmp = head;
-	i = 1;
-	while (tmp->num != min)
-		tmp = tmp->next;
-	while (1)
-	{
-		if (tmp->num > tmp->next->num)
-			break ;
-		tmp = tmp->next;
-		i++;
-		if (i == tmp->len)
-			return (0);
-	}
-	return (1);
-}
-
-t_list *rra(t_list *head)
+t_list *rra(t_list *head, int flag)
 {
 	head->ishead = 0;
 	head = head->prev;
 	head->ishead = 1;
-	printf("%s\n", ">> rra");
+	printf("%s\n", flag == 0 ? "rra" : "rrb");
 	return (head);
 }
 
-t_list *ra(t_list *head)
+t_list *ra(t_list *head, int flag)
 {
 	head->ishead = 0;
 	head = head->next;
 	head->ishead = 1;
-	printf("%s\n", ">> ra");
+	printf("%s\n", flag == 0 ? "ra" : "rb");
 	return (head);
 }
 
-t_list *sa(t_list *head)
+t_list *sa(t_list *head, int flag)
 {
 	int t;
 
@@ -215,73 +216,218 @@ t_list *sa(t_list *head)
 	t = head->num;
 	head->num = head->next->num;
 	head->next->num = t;
-	printf("%s\n", ">> sa");
+	printf("%s\n", flag == 0 ? "sa" : "sb");
 	return (head);
 }
 
-t_list *dosort(t_list *head, int min)
+int maxint(t_list *head)
+{
+	t_list	*tmp;
+	int		max;
+
+	tmp = head;
+	max = head->num;
+	while (tmp->next && tmp->next->ishead != 1)
+	{
+		tmp = tmp->next;
+		if (max < tmp->num)
+			max = tmp->num;
+	}
+	return (max);
+}
+
+int check(t_list *head, int min, int max, int flag)
+{
+	t_list *tmp;
+	int i;
+
+	tmp = head;
+	i = 1;
+	if (!head->next)
+		return (0);
+	if (flag == 0)
+	{
+		while (tmp->num != min)
+			tmp = tmp->next;
+		while (1)
+		{
+			if (tmp->num > tmp->next->num)
+				break ;
+			tmp = tmp->next;
+			i++;
+			if (i == tmp->len)
+				return (0);
+		}
+	}
+	else
+	{
+		while (tmp->num != max)
+			tmp = tmp->next;
+		while (1)
+		{
+			if (tmp->num < tmp->next->num)
+				break ;
+			tmp = tmp->next;
+			i++;
+			if (i == tmp->len)
+				return (0);
+		}
+	}
+	return (1);
+}
+
+t_list *dosort(t_list *head, int min, int max, int flag)
 {
 	int i;
 	t_list *tmp;
-	t_list *(*f)(t_list*);
+	t_list *(*f)(t_list*, int);
 
 	i = 0;
 	tmp = head;
-	while (tmp->num != min)
+	if (flag == 0)
 	{
-		tmp = tmp->next;
-		i++;
+		while (tmp->num != min)
+		{
+			tmp = tmp->next;
+			i++;
+		}
+		f = i > head->len / 2 ? &rra : &ra;
+		i = i > head->len / 2 ? head->len - i : i;
+		while (i > 0)
+		{
+			head = f(head, flag);
+			i--;
+		}
 	}
-	f = i > head->len / 2 ? &rra : &ra;
-	i = i > head->len / 2 ? head->len - i : i;
-	while (i > 0)
+	else
 	{
-		head = f(head);
-		i--;
+		while (tmp->num != max)
+		{
+			tmp = tmp->next;
+			i++;
+		}
+		f = i > head->len / 2 ? &rra : &ra;
+		i = i > head->len / 2 ? head->len - i : i;
+		while (i > 0)
+		{
+			head = f(head, flag);
+			i--;
+		}
 	}
 	return (head);
 }
 
-t_list *sortp(t_list *head)
+t_list *sortp(t_list *head, int flag)
 {
 	int min;
+	int max;
 
 	min = minint(head);
-	while (check(head, min))
+	max = maxint(head);
+	if (flag == 0)
 	{
-		if (head->num > head->next->num && head->next->num != min)
-			head = sa(head);
-		if (head->num < head->prev->num && head->num != min)
-			head = rra(head);
-		else
-			head = ra(head);
-		//print(head);
+		while (check(head, min, max, flag))
+		{
+			if (head->num > head->next->num && head->next->num != min)
+				head = sa(head, flag);
+			if (head->num < head->prev->num && head->num != min)
+				head = rra(head, flag);
+			else
+				head = ra(head, flag);
+			//print(head);
+		}
+		head = dosort(head, min, max, flag);
 	}
-	head = dosort(head, min);
+	else
+	{
+		while (check(head, min, max, flag))
+		{
+			if (head->num < head->next->num && head->next->num != max)
+				head = sa(head, flag);
+			if (head->num > head->prev->num && head->num != max)
+				head = rra(head, flag);
+			else
+				head = ra(head, flag);
+			//print(head);
+		}
+		head = dosort(head, min, max, flag);
+	}
+
+
 	return (head);
 }
 
-int main()
+int findmiddle(int ac, char **av)
 {
-	//int tab[] = {7,3,5,1};
-	//int tab[] = {9, 0, 1,2,3,4,5,6,7,8};
-	//int tab[] = {4,5,6,7,8,9,0,1,2,3};
-	int tab[] = {10,3,4,5,9,13,0,6,78,8};
-	int len = 10;
-	int i = 0;
-	t_list *tmp;
-	t_list *head;
+	int rez;
+	int i;
 
-	tmp = head = NULL;
-	while (i < len)
+	i = 1;
+	rez = 0;
+	while (i < ac)
 	{
-		head = add_list(head, tab[i], len);
+		rez += atoi(av[i]);
 		i++;
 	}
-	tmp = head;
-	print(tmp);
-	tmp = sortp(head);
-	print(tmp);
+	ac--;
+	return (rez / ac);
+}
+
+int lenb(int ac, char **av, int mid)
+{
+	int rez;
+	int i;
+
+	i = 1;
+	rez = 0;
+	while (i < ac)
+	{
+		if (mid < atoi(av[i]))
+			rez++;
+		i++;
+	}
+	return (rez);
+}
+
+void create_stakes(int ac, char **av, int len2, int mid)
+{
+	t_list *heada;
+	t_list *headb;
+	int i;
+	int n;
+
+	i = n = 0;
+	heada = headb = NULL;
+	while (++i < ac)
+	{
+		n = atoi(av[i]);
+		if (n > mid)
+			heada = add_list(heada, n, len2);
+		else
+			headb = prev_list(headb, n, ac - 1 - len2);
+	}
+	//print(heada);
+	//print(headb);
+	heada = sortp(heada, 0);
+	headb = sortp(headb, 1);
+	i = -1;
+	while (++i < ac - 1 - len2)
+		printf("%s\n", "pa");
+	//print(heada);
+	//print(headb);
+}
+
+int main(int ac, char **av)
+{
+	// 10 3 4 5 9 13 0 6 11 8 88
+	int mid;
+	int len2;
+
+	mid = len2 = 0;
+	mid = findmiddle(ac, av);
+	len2 = lenb(ac, av, mid);
+	//printf("%d %d %d\n", ac, mid, len2);
+	create_stakes(ac, av, len2, mid);
 	return (0);
 }
 
