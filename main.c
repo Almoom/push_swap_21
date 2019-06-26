@@ -236,83 +236,53 @@ int maxint(t_list *head)
 	return (max);
 }
 
-int check(t_list *head, int min, int max, int flag)
+int		check(t_list *head, int min, int max, int flag)
 {
-	t_list *tmp;
-	int i;
+	t_list	*tmp;
+	int		i;
+	int		t;
 
 	tmp = head;
 	i = 1;
+	t = flag == 0 ? min : max;
 	if (!head->next)
 		return (0);
-	if (flag == 0)
+	while (tmp->num != t)
+		tmp = tmp->next;
+	while (1)
 	{
-		while (tmp->num != min)
-			tmp = tmp->next;
-		while (1)
-		{
-			if (tmp->num > tmp->next->num)
-				break ;
-			tmp = tmp->next;
-			i++;
-			if (i == tmp->len)
-				return (0);
-		}
-	}
-	else
-	{
-		while (tmp->num != max)
-			tmp = tmp->next;
-		while (1)
-		{
-			if (tmp->num < tmp->next->num)
-				break ;
-			tmp = tmp->next;
-			i++;
-			if (i == tmp->len)
-				return (0);
-		}
+		if ((flag == 0 && tmp->num > tmp->next->num)
+		|| (flag == 1 && tmp->num < tmp->next->num))
+			break ;
+		tmp = tmp->next;
+		i++;
+		if (i == tmp->len)
+			return (0);
 	}
 	return (1);
 }
 
 t_list *dosort(t_list *head, int min, int max, int flag)
 {
-	int i;
-	t_list *tmp;
-	t_list *(*f)(t_list*, int);
+	int		i;
+	t_list	*tmp;
+	t_list	*(*f)(t_list*, int);
+	int		t;
 
 	i = 0;
 	tmp = head;
-	if (flag == 0)
+	t = flag == 0 ? min : max;
+	while (tmp->num != t)
 	{
-		while (tmp->num != min)
-		{
-			tmp = tmp->next;
-			i++;
-		}
-		f = i > head->len / 2 ? &rra : &ra;
-		i = i > head->len / 2 ? head->len - i : i;
-		while (i > 0)
-		{
-			head = f(head, flag);
-			i--;
-		}
+		tmp = tmp->next;
+		i++;
 	}
-	else
+	f = i > head->len / 2 ? &rra : &ra;
+	i = i > head->len / 2 ? head->len - i : i;
+	while (i > 0)
 	{
-		while (tmp->num != max)
-		{
-			tmp = tmp->next;
-			i++;
-		}
-		f = i > head->len / 2 ? &rra : &ra;
-		i = i > head->len / 2 ? head->len - i : i;
-		while (i > 0)
-		{
-			head = f(head, flag);
-			i--;
-		}
+		head = f(head, flag);
+		i--;
 	}
 	return (head);
 }
@@ -352,8 +322,6 @@ t_list *sortp(t_list *head, int flag)
 		}
 		head = dosort(head, min, max, flag);
 	}
-
-
 	return (head);
 }
 
@@ -406,8 +374,8 @@ void create_stakes(int ac, char **av, int len2, int mid)
 		else
 			headb = prev_list(headb, n, ac - 1 - len2);
 	}
-	//print(heada);
-	//print(headb);
+	// print(heada);
+	// print(headb);
 	heada = sortp(heada, 0);
 	headb = sortp(headb, 1);
 	i = -1;
@@ -419,7 +387,7 @@ void create_stakes(int ac, char **av, int len2, int mid)
 
 int main(int ac, char **av)
 {
-	// 10 3 4 5 9 13 0 6 11 8 88
+	// 10 3 4 5 9 13 0 6 11 8 -5
 	int mid;
 	int len2;
 
