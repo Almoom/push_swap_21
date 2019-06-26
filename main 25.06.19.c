@@ -190,67 +190,34 @@ int minint(t_list *head)
 	return (min);
 }
 
-void rr_aorb(t_list **head, int flag)
+t_list *rr_aorb(t_list *head, int flag)
 {
-	(*head)->ishead = 0;
-	*head = (*head)->prev;
-	(*head)->ishead = 1;
+	head->ishead = 0;
+	head = head->prev;
+	head->ishead = 1;
 	printf("%s\n", flag == 0 ? "rra" : "rrb");
+	return (head);
 }
 
-void r_aorb(t_list **head, int flag)
+t_list *r_aorb(t_list *head, int flag)
 {
-	(*head)->ishead = 0;
-	*head = (*head)->next;
-	(*head)->ishead = 1;
+	head->ishead = 0;
+	head = head->next;
+	head->ishead = 1;
 	printf("%s\n", flag == 0 ? "ra" : "rb");
+	return (head);
 }
 
-void s_aorb(t_list **head, int flag)
+t_list *s_aorb(t_list *head, int flag)
 {
 	int t;
 
 	t = 0;
-	t = (*head)->num;
-	(*head)->num = (*head)->next->num;
-	(*head)->next->num = t;
+	t = head->num;
+	head->num = head->next->num;
+	head->next->num = t;
 	printf("%s\n", flag == 0 ? "sa" : "sb");
-}
-
-void rrr(t_list **heada, t_list **headb)
-{
-	(*heada)->ishead = 0;
-	*heada = (*heada)->prev;
-	(*heada)->ishead = 1;
-	(*headb)->ishead = 0;
-	*headb = (*headb)->prev;
-	(*headb)->ishead = 1;
-	printf("%s\n", "rrr");
-}
-
-void rr(t_list **heada, t_list **headb)
-{
-	(*heada)->ishead = 0;
-	*heada = (*heada)->next;
-	(*heada)->ishead = 1;
-	(*headb)->ishead = 0;
-	*headb = (*headb)->next;
-	(*headb)->ishead = 1;
-	printf("%s\n", "rr");
-}
-
-void ss(t_list **heada, t_list **headb)
-{
-	int t;
-
-	t = 0;
-	t = (*heada)->num;
-	(*heada)->num = (*heada)->next->num;
-	(*heada)->next->num = t;
-	t = (*headb)->num;
-	(*headb)->num = (*headb)->next->num;
-	(*headb)->next->num = t;
-	printf("%s\n", "ss");
+	return (head);
 }
 
 int maxint(t_list *head)
@@ -269,7 +236,7 @@ int maxint(t_list *head)
 	return (max);
 }
 
-int		check(t_list *head, int flag)
+int		check(t_list *head, int min, int max, int flag)
 {
 	t_list	*tmp;
 	int		i;
@@ -277,7 +244,7 @@ int		check(t_list *head, int flag)
 
 	tmp = head;
 	i = 1;
-	t = flag == 0 ? minint(head) : maxint(head);
+	t = flag == 0 ? min : max;
 	if (!head->next)
 		return (0);
 	while (tmp->num != t)
@@ -295,53 +262,52 @@ int		check(t_list *head, int flag)
 	return (1);
 }
 
-void dosort(t_list *head, int flag)
+t_list *dosort(t_list *head, int min, int max, int flag)
 {
 	int		i;
 	t_list	*tmp;
-	char	*s;
-	int t;
+	t_list	*(*f)(t_list*, int);
+	int		t;
 
 	i = 0;
-	t = flag == 0 ? minint(head) : maxint(head);
 	tmp = head;
+	t = flag == 0 ? min : max;
 	while (tmp->num != t)
 	{
 		tmp = tmp->next;
 		i++;
 	}
-	s = i > head->len / 2 ? "rr" : "r";
+	f = i > head->len / 2 ? &rr_aorb : &r_aorb;
 	i = i > head->len / 2 ? head->len - i : i;
 	while (i > 0)
 	{
-		printf("%s%s\n", s, flag == 0 ? "a" : "b");
+		head = f(head, flag);
 		i--;
 	}
+	return (head);
 }
 
-void sortp_new(t_list *heada, t_list *headb, int mina, int maxb)
+t_list *sortp(t_list *head, int flag)
 {
-	while (check(heada, 0) || check(headb, 1))
+	int min;
+	int max;
+
+	min = minint(head);
+	max = maxint(head);
+	while (check(head, min, max, flag))
 	{
-		if ((heada->num > heada->next->num && heada->next->num != mina)
-		&& (headb->num < headb->next->num && headb->next->num != maxb))
-			ss(&heada, &headb);
-		if ((heada->num < heada->prev->num && heada->num != mina)
-		&& (headb->num > headb->prev->num && headb->num != maxb))
-			rrr(&heada, &headb);
-		if (heada->num > heada->next->num && heada->next->num != mina)
-			s_aorb(&heada, 0);
-		if (headb->num < headb->next->num && headb->next->num != maxb)
-			s_aorb(&headb, 1);
-		if (heada->num < heada->prev->num && heada->num != mina)
-			rr_aorb(&heada, 0);
-		else if (headb->num > headb->prev->num && headb->num != maxb)
-			rr_aorb(&headb, 1);
-		else
-			rr(&heada, &headb);
+			if ((!flag && head->num > head->next->num && head->next->num != min)
+			|| (flag && head->num < head->next->num && head->next->num != max))
+				head = s_aorb(head, flag);
+			if ((!flag && head->num < head->prev->num && head->num != min)
+			|| (flag && head->num > head->prev->num && head->num != max))
+				head = rr_aorb(head, flag);
+			else
+				head = r_aorb(head, flag);
+		//print(head);
 	}
-	dosort(heada, 0);
-	dosort(headb, 1);
+	head = dosort(head, min, max, flag);
+	return (head);
 }
 
 int findmiddle(int ac, char **av)
@@ -395,24 +361,25 @@ void create_stakes(int ac, char **av, int len2, int mid)
 	}
 	// print(heada);
 	// print(headb);
-	sortp_new(heada, headb, minint(heada), maxint(headb));
-
+	heada = sortp(heada, 0);
+	headb = sortp(headb, 1);
 	i = -1;
 	while (++i < ac - 1 - len2)
 		printf("%s\n", "pa");
-	// print(heada);
-	// print(headb);
+	print(heada);
+	print(headb);
 }
 
 int main(int ac, char **av)
 {
-	// 10 3 4 5 9 13 0 6 11 8 -5 -3 -99
+	// 10 3 4 5 9 13 0 6 11 8 -5
 	int mid;
 	int len2;
 
 	mid = len2 = 0;
 	mid = findmiddle(ac, av);
 	len2 = lenb(ac, av, mid);
+	//printf("%d %d %d\n", ac, mid, len2);
 	create_stakes(ac, av, len2, mid);
 	return (0);
 }
