@@ -112,6 +112,16 @@ void print(t_list *tmp)
 	}
 	printf("\n");
 }
+void print_l(t_l *tmp)
+{
+	printf("%d\t", tmp->num);
+	while (tmp->next)
+	{
+		tmp = tmp->next;
+		printf("%d\t", tmp->num);
+	}
+	printf("\n");
+}
 
 t_list	*create_list(int num, int ishead, int len)
 {
@@ -344,39 +354,7 @@ void sortp_new(t_list *heada, t_list *headb, int mina, int maxb)
 	dosort(headb, 1);
 }
 
-int findmiddle(int ac, char **av)
-{
-	int rez;
-	int i;
-
-	i = 1;
-	rez = 0;
-	while (i < ac)
-	{
-		rez += atoi(av[i]);
-		i++;
-	}
-	ac--;
-	return (rez / ac);
-}
-
-int lenb(int ac, char **av, int mid)
-{
-	int rez;
-	int i;
-
-	i = 1;
-	rez = 0;
-	while (i < ac)
-	{
-		if (mid < atoi(av[i]))
-			rez++;
-		i++;
-	}
-	return (rez);
-}
-
-void create_stakes(int ac, char **av, int len2, int mid)
+void create_stakes(int ac, char **av, int lena, int mid)
 {
 	t_list *heada;
 	t_list *headb;
@@ -388,31 +366,130 @@ void create_stakes(int ac, char **av, int len2, int mid)
 	while (++i < ac)
 	{
 		n = atoi(av[i]);
-		if (n > mid)
-			heada = add_list(heada, n, len2);
+		if (n >= mid)
+			heada = add_list(heada, n, ac - 1 - lena);
 		else
-			headb = prev_list(headb, n, ac - 1 - len2);
+			headb = prev_list(headb, n, lena);
 	}
 	// print(heada);
 	// print(headb);
 	sortp_new(heada, headb, minint(heada), maxint(headb));
 
 	i = -1;
-	while (++i < ac - 1 - len2)
+	while (++i < ac - 1 - lena)
 		printf("%s\n", "pa");
 	// print(heada);
 	// print(headb);
 }
 
+t_l *create_l(int num)
+{
+	t_l *list;
+
+	if (!(list = (t_l*)malloc(sizeof(*list))))
+		return (NULL);
+	list->num = num;
+	list->next = NULL;
+	return (list);
+}
+
+t_l	*add_l(t_l *head, int num)
+{
+	t_l *tmp;
+
+	tmp = head;
+	if (!head)
+		head = create_l(num);
+	else
+	{
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = create_l(num);
+	}
+	return (head);
+}
+
+t_l *create_pre(int ac, char **av)
+{
+	int i;
+	t_l *head;
+
+	i = 0;
+	head = NULL;
+	while (++i < ac)
+		head = add_l(head, atoi(av[i]));
+	return (head);
+}
+
+t_l *presort(t_l *head)
+{
+	t_l *tmp;
+	int t;
+
+	tmp = head;
+	while (head->next)
+	{
+		if (head->num > head->next->num)
+		{
+			t = head->next->num;
+			head->next->num = head->num;
+			head->num = t;
+			head = tmp;
+		}
+		else
+			head = head->next;
+	}
+	return (tmp);
+}
+
+int findmiddle(t_l *head, int ac)
+{
+	int rez;
+	int i;
+
+	i = 0;
+	while (head)
+	{
+		rez = head->num;
+		head = head->next;
+		i++;
+		if (i >= ac / 2)
+			break ;
+	}
+	return (rez);
+}
+
+int len_a(t_l *head, int mid)
+{
+	int rez;
+
+	rez = 0;
+	while (head)
+	{
+		if (mid > head->num)
+			rez++;
+		else
+			break ;
+		head = head->next;
+	}
+	return (rez);
+}
+
 int main(int ac, char **av)
 {
-	// 10 3 4 5 9 13 0 6 11 8 -5 -3 -99
+	// 10 3 4 5 9 13 0 6 11 8 -5 -3 -99 1000
 	int mid;
-	int len2;
+	int lena;
+	t_l *head;
 
-	mid = len2 = 0;
-	mid = findmiddle(ac, av);
-	len2 = lenb(ac, av, mid);
-	create_stakes(ac, av, len2, mid);
+	head = create_pre(ac, av);
+	head = presort(head);
+	//print_l(head);
+	mid = lena = 0;
+	mid = findmiddle(head, ac);
+	//printf("--%d\n", mid);
+	lena = len_a(head, mid);
+	//printf("--%d\n", lena);
+	create_stakes(ac, av, lena, mid);
 	return (0);
 }

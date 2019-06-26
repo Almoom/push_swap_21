@@ -16,7 +16,6 @@
 # include <stdlib.h>
 # include <stdio.h>
 
-
 typedef struct		s_list
 {
 	struct s_list	*prev;
@@ -25,4 +24,9 @@ typedef struct		s_list
 	int				ishead;
 	int				len;
 }					t_list;
+typedef struct		s_l
+{
+	struct s_l		*next;
+	int				num;
+}					t_l;
 #endif
