@@ -190,7 +190,7 @@ int minint(t_list *head)
 	return (min);
 }
 
-t_list *rra(t_list *head, int flag)
+t_list *rr_aorb(t_list *head, int flag)
 {
 	head->ishead = 0;
 	head = head->prev;
@@ -199,7 +199,7 @@ t_list *rra(t_list *head, int flag)
 	return (head);
 }
 
-t_list *ra(t_list *head, int flag)
+t_list *r_aorb(t_list *head, int flag)
 {
 	head->ishead = 0;
 	head = head->next;
@@ -208,7 +208,7 @@ t_list *ra(t_list *head, int flag)
 	return (head);
 }
 
-t_list *sa(t_list *head, int flag)
+t_list *s_aorb(t_list *head, int flag)
 {
 	int t;
 
@@ -277,7 +277,7 @@ t_list *dosort(t_list *head, int min, int max, int flag)
 		tmp = tmp->next;
 		i++;
 	}
-	f = i > head->len / 2 ? &rra : &ra;
+	f = i > head->len / 2 ? &rr_aorb : &r_aorb;
 	i = i > head->len / 2 ? head->len - i : i;
 	while (i > 0)
 	{
@@ -294,34 +294,19 @@ t_list *sortp(t_list *head, int flag)
 
 	min = minint(head);
 	max = maxint(head);
-	if (flag == 0)
+	while (check(head, min, max, flag))
 	{
-		while (check(head, min, max, flag))
-		{
-			if (head->num > head->next->num && head->next->num != min)
-				head = sa(head, flag);
-			if (head->num < head->prev->num && head->num != min)
-				head = rra(head, flag);
+			if ((!flag && head->num > head->next->num && head->next->num != min)
+			|| (flag && head->num < head->next->num && head->next->num != max))
+				head = s_aorb(head, flag);
+			if ((!flag && head->num < head->prev->num && head->num != min)
+			|| (flag && head->num > head->prev->num && head->num != max))
+				head = rr_aorb(head, flag);
 			else
-				head = ra(head, flag);
-			//print(head);
-		}
-		head = dosort(head, min, max, flag);
+				head = r_aorb(head, flag);
+		//print(head);
 	}
-	else
-	{
-		while (check(head, min, max, flag))
-		{
-			if (head->num < head->next->num && head->next->num != max)
-				head = sa(head, flag);
-			if (head->num > head->prev->num && head->num != max)
-				head = rra(head, flag);
-			else
-				head = ra(head, flag);
-			//print(head);
-		}
-		head = dosort(head, min, max, flag);
-	}
+	head = dosort(head, min, max, flag);
 	return (head);
 }
 
@@ -381,8 +366,8 @@ void create_stakes(int ac, char **av, int len2, int mid)
 	i = -1;
 	while (++i < ac - 1 - len2)
 		printf("%s\n", "pa");
-	//print(heada);
-	//print(headb);
+	print(heada);
+	print(headb);
 }
 
 int main(int ac, char **av)
