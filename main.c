@@ -33,8 +33,12 @@ t_lst	*create_list(int num, int ishead)
 	list->ishead = ishead == 1 ? 1 : 0;
 	list->prev = NULL;
 	list->next = NULL;
-	list->len = NULL;
-	list->cost = -1;
+	list->ra = 0;
+	list->rb = 0;
+    list->rr = 0;
+    list->rrb = 0;
+    list->rra = 0;
+    list->rrr = 0;
 	return (list);
 }
 
@@ -60,9 +64,112 @@ t_lst *create_stake(t_lst *head, int n)
 	return (head);
 }
 
-void sort1(t_lst *head)
+t_lst *rr_aorb(t_lst *head, int flag)
 {
-	
+    head->ishead = 0;
+    head = head->prev;
+    head->ishead = 1;
+    printf("%s\n", flag == 0 ? "rra" : "rrb");
+    return (head);
+}
+
+t_lst *r_aorb(t_lst *head, int flag)
+{
+    head->ishead = 0;
+    head = head->next;
+    head->ishead = 1;
+    printf("%s\n", flag == 0 ? "ra" : "rb");
+    return (head);
+}
+
+t_lst *s_aorb(t_lst *head, int flag)
+{
+    int t;
+
+    t = 0;
+    t = head->num;
+    head->num = head->next->num;
+    head->next->num = t;
+    printf("%s\n", flag == 0 ? "sa" : "sb");
+    return (head);
+}
+
+t_lst *dosort(t_lst *head, int min)
+{
+    int		i;
+    t_lst	*tmp;
+
+    i = 0;
+    tmp = head;
+    while (tmp->num != min)
+    {
+        tmp = tmp->next;
+        i++;
+    }
+    while (i > 0)
+    {
+        head = r_aorb(head, 0);
+        i--;
+    }
+    return (head);
+}
+
+int		check(t_lst *head, int min, int len)
+{
+    t_lst	*tmp;
+    int		i;
+
+    tmp = head;
+    i = 1;
+    if (!head->next)
+        return (0);
+    while (tmp->num != min)
+        tmp = tmp->next;
+    while (1)
+    {
+        if (tmp->num > tmp->next->num)
+            break ;
+        tmp = tmp->next;
+        i++;
+        if (i == len)
+            return (0);
+    }
+    return (1);
+}
+
+int minint(t_lst *head)
+{
+    t_lst	*tmp;
+    int		min;
+
+    tmp = head;
+    min = head->num;
+    while (tmp->next && tmp->next->ishead != 1)
+    {
+        tmp = tmp->next;
+        if (min > tmp->num)
+            min = tmp->num;
+    }
+    return (min);
+}
+
+void sort1(t_lst **head, int len)
+{
+    int min;
+
+    min = minint(*head);
+    while (check(*head, min, len))
+    {
+        if ((*head)->num > (*head)->next->num && (*head)->next->num != min)
+            (*head) = s_aorb((*head), 0);
+        if ((*head)->num < (*head)->prev->num && (*head)->num != min)
+            (*head) = rr_aorb((*head), 0);
+        else
+            (*head) = r_aorb((*head), 0);
+        //print(head);
+    }
+    (*head) = dosort((*head), min);
+    //return (head);
 }
 
 void push_swap(int ac, char **av)
@@ -73,9 +180,9 @@ void push_swap(int ac, char **av)
 
 	i = 0;
 	heada = headb = NULL;
-	if (ac > 6)
+	if (ac > 4)
 	{
-		while (++i < 4)
+		while (++i < 3)
 			headb = create_stake(headb, atoi(av[i]));
 		print(headb);
 		i--;
@@ -88,8 +195,9 @@ void push_swap(int ac, char **av)
 	{
 		while (++i < ac)
 			heada = create_stake(heada, atoi(av[i]));
-		print(heada);
-		sort1(heada);
+		//print(heada);
+		sort1(&heada, ac - 1);
+        //print(heada);
 	}
 	//headb = create_stake_b(headb, heada);
 }

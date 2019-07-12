@@ -21,9 +21,13 @@ typedef struct		s_lst
 	struct s_lst	*prev;
 	struct s_lst	*next;
 	int				num;
-	int				cost;
 	int				ishead;
-	int				*len;
+	int             ra;
+	int             rb;
+	int             rr;
+	int             rra;
+	int             rrb;
+	int             rrr;
 }					t_lst;
 
 typedef struct		s_list
