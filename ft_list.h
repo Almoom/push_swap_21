@@ -29,7 +29,6 @@ typedef struct		s_lst
 	int             rrb;
 	int             rrr;
 }					t_lst;
-
 typedef struct		s_list
 {
 	struct s_list	*prev;

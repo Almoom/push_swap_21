@@ -14,11 +14,6 @@
 
 void print(t_lst *tmp)
 {
-	if (!tmp)
-	{
-		printf("%s\n", "NULL");
-		return ;
-	}
 	printf("%d\t", tmp->num);
 	while (tmp->next && tmp->next->ishead != 1)
 	{
@@ -177,138 +172,6 @@ void sort1(t_lst **head, int len)
     //return (head);
 }
 
-void sort(t_lst *heada, t_lst *headb)
-{
-
-	printf("%d->\t", heada->num);
-	printf("ra: %d\t", heada->ra);
-	printf("rb: %d\t", heada->rb);
-	printf("rr: %d\t", heada->rr);
-	printf("rra: %d\t", heada->rra);
-	printf("rrb: %d\t", heada->rrb);
-	printf("rrr: %d\t", heada->rrr);
-	printf("\n");
-	while (heada->next && heada->next->ishead != 1)
-	{
-		heada = heada->next;
-		printf("%d->\t", heada->num);
-		printf("ra: %d\t", heada->ra);
-		printf("rb: %d\t", heada->rb);
-		printf("rr: %d\t", heada->rr);
-		printf("rra: %d\t", heada->rra);
-		printf("rrb: %d\t", heada->rrb);
-		printf("rrr: %d\t", heada->rrr);
-		printf("\n");
-	}
-}
-
-int ft_abs(int a, int b)
-{
-	if (a - b < 0)
-		return (b - a);
-	return (a - b);
-}
-
-int find_rb(int num, t_lst *headb)
-{
-	int min;
-	int i;
-	int rez;
-
-	i = rez = 0;
-	min = ft_abs(num, headb->num);
-	printf("%d-\n", min);
-	while (headb->next && headb->next->ishead != 1)
-	{
-		headb = headb->next;
-		i++;
-		printf("%d--\n", ft_abs(num, headb->num));
-		if (min > ft_abs(num, headb->num))
-		{
-			min = ft_abs(num, headb->num);
-			rez = i;
-		}
-	}
-	printf("%d---\n", rez);
-	return (rez);
-}
-
-int find_rrb(int num, t_lst *headb)
-{
-	int min;
-	int i;
-	int rez;
-
-	i = rez = 0;
-	min = ft_abs(num, headb->num);
-	printf("%d-\n", min);
-	while (headb->prev && headb->prev->ishead != 1)
-	{
-		headb = headb->prev;
-		i++;
-		printf("%d--\n", ft_abs(num, headb->num));
-		if (min > ft_abs(num, headb->num))
-		{
-			min = ft_abs(num, headb->num);
-			rez = i;
-		}
-	}
-	printf("%d---\n", rez);
-	return (rez);
-}
-
-void coast_r(t_lst *heada, t_lst *headb)
-{
-	int i;
-
-	i = 0;
-	heada->rb = find_rb(heada->num, headb);
-	while (heada->next && heada->next->ishead != 1)
-	{
-		heada = heada->next;
-		i++;
-		heada->ra = i;
-		heada->rb = find_rb(heada->num, headb);
-		heada->rr = heada->ra > heada->rb ? heada->rb : heada->ra;
-		heada->ra = heada->ra - heada->rr;
-		heada->rb = heada->rb - heada->rr;
-	}
-}
-
-void coast_rr(t_lst *heada, t_lst *headb)
-{
-	int i;
-
-	i = 0;
-	heada->rrb = find_rrb(heada->num, headb);
-	while (heada->prev && heada->prev->ishead != 1)
-	{
-		heada = heada->prev;
-		i++;
-		heada->rra = i;
-		heada->rrb = find_rrb(heada->num, headb);
-		heada->rrr = heada->rra > heada->rrb ? heada->rrb : heada->rra;
-		heada->rra = heada->rra - heada->rrr;
-		heada->rrb = heada->rrb - heada->rrr;
-	}
-}
-
-void coast_rez(t_lst *h)
-{
-	if (h->ra + h->rb + h->rr > h->rra + h->rrb + h->rrr)
-		h->ra = h->rb = h->rr = 0;
-	else
-		h->rra = h->rrb = h->rrr = 0;
-	while (h->next && h->next->ishead != 1)
-	{
-		h = h->next;
-		if (h->ra + h->rb + h->rr > h->rra + h->rrb + h->rrr)
-			h->ra = h->rb = h->rr = 0;
-		else
-			h->rra = h->rrb = h->rrr = 0;
-	}
-}
-
 void push_swap(int ac, char **av)
 {
 	t_lst *heada;
@@ -317,19 +180,26 @@ void push_swap(int ac, char **av)
 
 	i = 0;
 	heada = headb = NULL;
-	while (++i < 3)
-		headb = create_stake(headb, atoi(av[i]));
-	i--;
-	while (++i < ac)
-		heada = create_stake(heada, atoi(av[i]));
-	print(heada);
-	print(headb);
-	coast_r(heada, headb);
-	coast_rr(heada, headb);
-	coast_rez(heada);
-	sort(heada, headb);
-	print(heada);
-	print(headb);
+	if (ac > 4)
+	{
+		while (++i < 3)
+			headb = create_stake(headb, atoi(av[i]));
+		print(headb);
+		i--;
+		while (++i < ac)
+			heada = create_stake(heada, atoi(av[i]));
+		print(heada);
+		//sort2();
+	}
+	else
+	{
+		while (++i < ac)
+			heada = create_stake(heada, atoi(av[i]));
+		//print(heada);
+		sort1(&heada, ac - 1);
+        //print(heada);
+	}
+	//headb = create_stake_b(headb, heada);
 }
 
 int main(int ac, char **av)
