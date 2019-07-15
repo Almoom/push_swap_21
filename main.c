@@ -236,21 +236,22 @@ int find_rb(int num, t_lst *headb)
 	int rez;
 
 	i = rez = 0;
-	min = ft_abs(num, headb->num);
+	min = num - headb->num;
 	//printf("%d-\n", min);
 	while (headb->next && headb->next->ishead != 1)
 	{
 		headb = headb->next;
 		i++;
+
 		//printf("%d--\n", ft_abs(num, headb->num));
-		if (min > ft_abs(num, headb->num))
+		if (ft_abs(min, 0) > ft_abs(num, headb->num))
 		{
-			min = ft_abs(num, headb->num);
+			min = num - headb->num;;
 			rez = i;
 		}
 	}
-	//printf("%d---\n", rez);
-	return (rez);
+	//printf("%d---\n", rez * min / ft_abs(min, 0));
+	return (rez * min / ft_abs(min, 0));
 }
 
 int find_rrb(int num, t_lst *headb)
@@ -260,16 +261,16 @@ int find_rrb(int num, t_lst *headb)
 	int rez;
 
 	i = rez = 0;
-	min = ft_abs(num, headb->num);
+	min = num - headb->num;
 	//printf("%d-\n", min);
 	while (headb->prev && headb->prev->ishead != 1)
 	{
 		headb = headb->prev;
 		i++;
 		//printf("%d--\n", ft_abs(num, headb->num));
-		if (min > ft_abs(num, headb->num))
+		if (ft_abs(min, 0) > ft_abs(num, headb->num))
 		{
-			min = ft_abs(num, headb->num);
+			min = num - headb->num;
 			rez = i;
 		}
 	}
@@ -283,12 +284,21 @@ void coast_r(t_lst *heada, t_lst *headb)
 
 	i = 0;
 	heada->rb = find_rb(heada->num, headb);
+	if (heada->rb < 0)
+	{
+		heada->rrb += 1;
+		heada->rb = 0;
+	}
 	while (heada->next && heada->next->ishead != 1)
 	{
 		heada = heada->next;
 		i++;
 		heada->ra = i;
 		heada->rb = find_rb(heada->num, headb);
+		{
+			heada->rrb += 1;
+			heada->rb = 0;
+		}
 		heada->rr = heada->ra > heada->rb ? heada->rb : heada->ra;
 		heada->ra = heada->ra - heada->rr;
 		heada->rb = heada->rb - heada->rr;
@@ -301,12 +311,22 @@ void coast_rr(t_lst *heada, t_lst *headb)
 
 	i = 0;
 	heada->rrb = find_rrb(heada->num, headb);
+	if (heada->rrb < 0)
+	{
+		heada->rb += 1;
+		heada->rrb = 0;
+	}
 	while (heada->prev && heada->prev->ishead != 1)
 	{
 		heada = heada->prev;
 		i++;
 		heada->rra = i;
 		heada->rrb = find_rrb(heada->num, headb);
+		if (heada->rrb < 0)
+		{
+			heada->rb += 1;
+			heada->rrb = 0;
+		}
 		heada->rrr = heada->rra > heada->rrb ? heada->rrb : heada->rra;
 		heada->rra = heada->rra - heada->rrr;
 		heada->rrb = heada->rrb - heada->rrr;
@@ -315,17 +335,22 @@ void coast_rr(t_lst *heada, t_lst *headb)
 
 void coast_rez(t_lst *h)
 {
-	if (h->ra + h->rb + h->rr > h->rra + h->rrb + h->rrr)
-		h->ra = h->rb = h->rr = 0;
-	else
-		h->rra = h->rrb = h->rrr = 0;
+	if (!(h->ra + h->rb + h->rr == 0 || h->rra + h->rrb + h->rrr == 0))
+	{
+		if (h->ra + h->rb + h->rr < h->rra + h->rrb + h->rrr)
+			h->rra = h->rrb = h->rrr = 0;
+		else
+			h->ra = h->rb = h->rr = 0;
+	}
 	while (h->next && h->next->ishead != 1)
 	{
 		h = h->next;
-		if (h->ra + h->rb + h->rr > h->rra + h->rrb + h->rrr)
-			h->ra = h->rb = h->rr = 0;
-		else
+		if (h->ra + h->rb + h->rr == 0 || h->rra + h->rrb + h->rrr == 0)
+			continue ;
+		if (h->ra + h->rb + h->rr < h->rra + h->rrb + h->rrr)
 			h->rra = h->rrb = h->rrr = 0;
+		else
+			h->ra = h->rb = h->rr = 0;
 	}
 }
 
