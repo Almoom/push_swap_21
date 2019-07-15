@@ -42,4 +42,6 @@ typedef struct		s_l
 	struct s_l		*next;
 	int				num;
 }					t_l;
+int					maxint(t_lst *head);
+int					minint(t_lst *head);
 #endif
