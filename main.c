@@ -97,36 +97,6 @@ t_lst *create_stake(t_lst *head, int n)
 	return (head);
 }
 
-// t_lst *rr_aorb(t_lst *head, int flag)
-// {
-//     head->ishead = 0;
-//     head = head->prev;
-//     head->ishead = 1;
-//     printf("%s\n", flag == 0 ? "rra" : "rrb");
-//     return (head);
-// }
-//
-// t_lst *r_aorb(t_lst *head, int flag)
-// {
-//     head->ishead = 0;
-//     head = head->next;
-//     head->ishead = 1;
-//     printf("%s\n", flag == 0 ? "ra" : "rb");
-//     return (head);
-// }
-//
-// t_lst *s_aorb(t_lst *head, int flag)
-// {
-//     int t;
-//
-//     t = 0;
-//     t = head->num;
-//     head->num = head->next->num;
-//     head->next->num = t;
-//     printf("%s\n", flag == 0 ? "sa" : "sb");
-//     return (head);
-// }
-//
 void dosort(t_lst *head, int flag, int len)
 {
 	int		i;
@@ -150,29 +120,6 @@ void dosort(t_lst *head, int flag, int len)
 		i--;
 	}
 }
-//
-// int		check(t_lst *head, int min, int len)
-// {
-//     t_lst	*tmp;
-//     int		i;
-//
-//     tmp = head;
-//     i = 1;
-//     if (!head->next)
-//         return (0);
-//     while (tmp->num != min)
-//         tmp = tmp->next;
-//     while (1)
-//     {
-//         if (tmp->num > tmp->next->num)
-//             break ;
-//         tmp = tmp->next;
-//         i++;
-//         if (i == len)
-//             return (0);
-//     }
-//     return (1);
-// }
 
 int minint(t_lst *head)
 {
@@ -206,25 +153,6 @@ int maxint(t_lst *head)
 	return (max);
 }
 
-// void sort1(t_lst **head, int len)
-// {
-//     int min;
-//
-//     min = minint(*head);
-//     while (check(*head, min, len))
-//     {
-//         if ((*head)->num > (*head)->next->num && (*head)->next->num != min)
-//             (*head) = s_aorb((*head), 0);
-//         if ((*head)->num < (*head)->prev->num && (*head)->num != min)
-//             (*head) = rr_aorb((*head), 0);
-//         else
-//             (*head) = r_aorb((*head), 0);
-//         //print(head);
-//     }
-//     //(*head) = dosort((*head), min);
-//     //return (head);
-// }
-//
 void print_coast(t_lst *heada)
 {
 	if (heada->here == 1)
@@ -254,13 +182,6 @@ void print_coast(t_lst *heada)
 		}
 	}
 }
-
-// int ft_abs(int a, int b)
-// {
-// 	if (a - b < 0)
-// 		return (b - a);
-// 	return (a - b);
-// }
 
 int find_rb(int num, t_lst *headb)
 {
@@ -316,10 +237,6 @@ int find_rrb(int num, t_lst *headb)
 	int i;
 
 	i = 0;
-	// if (headb->here == 1)
-	// 	i++;
-	// if (num == headb->num)
-	// 	return(i);
 	while (headb->prev && headb->prev->ishead != 1)
 	{
 		headb = headb->prev;
@@ -399,7 +316,7 @@ t_lst *find_cheap(t_lst *h)
 	}
 	return (it);
 }
-//
+
 void rr_ab(t_lst **head, int flag)
 {
 	int n;
@@ -465,20 +382,7 @@ void rrr(t_lst **heada, t_lst **headb)
 	(*headb)->ishead = 1;
 	printf("%s\n", "rrr");
 }
-//
-// t_lst *add_list(t_lst *head, int num)
-// {
-// 	t_lst *list;
-//
-// 	list = create_list(num, 1);
-// 	list->next = head;
-// 	list->prev = head->prev;
-// 	head->ishead = 0;
-// 	head->prev->next = list;
-// 	head->prev = list;
-// 	return (list);
-// }
-//
+
 void p_ab(t_lst **heada, t_lst **headb)
 {
 	t_lst *lst;
@@ -589,6 +493,22 @@ void create_both(t_lst **heada, t_lst **headb, int ac, char **av)
 	}
 }
 
+void del_stack(t_lst **head, int n)
+{
+	t_lst *t;
+	int i;
+
+	t = NULL;
+	i = 0;
+	while (i < n)
+	{
+		t = (*head)->next;
+		free(*head);
+		*head = t;
+		i++;
+	}
+}
+
 void push_swap(int ac, char **av)
 {
 	t_lst *heada;
@@ -602,7 +522,6 @@ void push_swap(int ac, char **av)
 	// print(heada);
 	// print(headb);
 	i = ac - 3;
-
 	while (i > 0)
 	{
 		coast_r(heada, headb);
@@ -615,9 +534,15 @@ void push_swap(int ac, char **av)
 		// print(headb);
 		i--;
 	}
-
 	dosort(headb, 1, ac - 1);
 	ft_throw(ac - 1);
+	del_stack(&heada, ac - 1);
+	del_stack(&headb, ac - 1);
+}
+
+void simple_sort(int ac, char **av)
+{
+
 }
 
 int main(int ac, char **av)
@@ -626,8 +551,10 @@ int main(int ac, char **av)
 	// 16 12 17 10 7 9 1 19 8 4 2 15 13 6 20 14 18 5 11 3 --127 --75
 	// 20	19	18	17	16	15	14	13	12	11	10	9	8	7	6	5	4	3	2	1
 
-	if (ac > 3)
+	if (ac > 6)
 		push_swap(ac, av);
+	else if (ac > 3 && ac <= 6)
+		simple_sort(ac, av);
 	else if (ac == 3 && ft_atoi(av[1]) > ft_atoi(av[2]))
 		printf("%s\n", "sa");
 	return (0);
