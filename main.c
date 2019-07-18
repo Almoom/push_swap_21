@@ -104,16 +104,19 @@ void dosort(t_lst *head, int flag, int len)
 	char	*s;
 	int t;
 
-	i = 0;
+	i = 1;
 	t = flag == 0 ? minint(head) : maxint(head);
+	//printf("%d--\n", len);
 	tmp = head;
 	while (tmp->num != t)
 	{
 		tmp = tmp->next;
 		i++;
 	}
-	s = i > len / 2 ? "rr" : "r";
-	i = i > len / 2 ? len - i : i;
+	//printf("%d--\n", i);
+	s = i - 1 > len / 2 ? "rr" : "r";
+	i = i - 1 > len / 2 ? len - (i - 1) : i - 1;
+	//printf("%d--\n", i);
 	while (i > 0)
 	{
 		printf("%s%s\n", s, flag == 0 ? "a" : "b");
@@ -163,8 +166,7 @@ void print_coast(t_lst *heada)
 		printf("rr: %d\t", heada->rr);
 		printf("rra: %d\t", heada->rra);
 		printf("rrb: %d\t", heada->rrb);
-		printf("rrr: %d\t", heada->rrr);
-		printf("\n");
+		printf("rrr: %d\t\n", heada->rrr);
 	}
 	while (heada->next && heada->next->ishead != 1)
 	{
@@ -177,8 +179,7 @@ void print_coast(t_lst *heada)
 			printf("rr: %d\t", heada->rr);
 			printf("rra: %d\t", heada->rra);
 			printf("rrb: %d\t", heada->rrb);
-			printf("rrr: %d\t", heada->rrr);
-			printf("\n");
+			printf("rrr: %d\t\n", heada->rrr);
 		}
 	}
 }
@@ -219,7 +220,6 @@ void coast_r(t_lst *heada, t_lst *headb)
 	while (heada->next && heada->next->ishead != 1)
 	{
 		heada = heada->next;
-
 		if (heada->here == 1)
 		{
 			i++;
@@ -273,7 +273,6 @@ void coast_rr(t_lst *heada, t_lst *headb)
 			heada->rra = heada->rra - heada->rrr;
 			heada->rrb = heada->rrb - heada->rrr;
 		}
-
 	}
 }
 
@@ -540,21 +539,138 @@ void push_swap(int ac, char **av)
 	del_stack(&headb, ac - 1);
 }
 
+t_lst *rr_aorb(t_lst *head, int flag)
+{
+    head->ishead = 0;
+    head = head->prev;
+    head->ishead = 1;
+    printf("%s\n", flag == 0 ? "rra" : "rrb");
+    return (head);
+}
+
+t_lst *r_aorb(t_lst *head, int flag)
+{
+    head->ishead = 0;
+    head = head->next;
+    head->ishead = 1;
+    printf("%s\n", flag == 0 ? "ra" : "rb");
+    return (head);
+}
+
+t_lst *s_aorb(t_lst *head, int flag)
+{
+    int t;
+
+    t = 0;
+    t = head->num;
+    head->num = head->next->num;
+    head->next->num = t;
+    printf("%s\n", flag == 0 ? "sa" : "sb");
+    return (head);
+}
+
+int		check(t_lst *head, int min, int len)
+{
+    t_lst	*tmp;
+    int		i;
+
+    tmp = head;
+    i = 1;
+    if (!head->next)
+        return (0);
+    while (tmp->num != min)
+        tmp = tmp->next;
+    while (1)
+    {
+        if (tmp->num > tmp->next->num)
+            break ;
+        tmp = tmp->next;
+        i++;
+        if (i == len)
+            return (0);
+    }
+    return (1);
+}
+
+t_lst *del_list(t_lst *h)
+{
+	t_lst *tmp;
+	t_lst *next;
+	t_lst *prev;
+
+	printf("%s\n", "pb");
+	(h)->ishead = 0;
+	next = (h)->next;
+	prev = (h)->prev;
+	h = (h)->next;
+	h->ishead = 1;
+	next->prev = prev;
+	prev->next = next;
+	free(tmp);
+	return (h);
+}
+
+int sort(t_lst *h, int len)
+{
+	int i;
+
+	i = 0;
+	while (check(h, minint(h), len))
+	{
+		if (h->num == maxint(h) && i++ < 2)
+		{
+			len = len - 1;
+			h = del_list(h);
+		}
+		else
+		{
+			if ((h)->num > (h)->next->num && (h)->next->num != minint(h))
+				(h) = s_aorb((h), 0);
+			if (check(h, minint(h), len))
+			{
+				if ((h)->num < (h)->prev->num && (h)->num != minint(h))
+					(h) = rr_aorb((h), 0);
+				else
+					(h) = r_aorb((h), 0);
+			}
+		}
+	}
+	dosort(h, 0, len);
+	return (i);
+}
+
 void simple_sort(int ac, char **av)
 {
+	t_lst *heada;
+	t_lst *lst;
+	int i;
 
+	i = 0;
+	heada = lst = NULL;
+	while (++i < ac)
+		heada = create_stake(heada, ft_atoi(av[i]));
+	lst = heada;
+	lst->here = 1;
+	while (lst->next && lst->next->ishead != 1)
+	{
+		lst = lst->next;
+		lst->here = 1;
+	}
+	i = sort(heada, ac - 1);
+	//del_stack(&heada, ac - i - 1);
+	while (i-- > 0)
+		printf("%s\n%s\n", "pa", "ra");
 }
 
 int main(int ac, char **av)
 {
 	// 10 3 4 5 9 -2 13 0 6 11 8 -5 -3 -99 1000 18 -11 --58
 	// 16 12 17 10 7 9 1 19 8 4 2 15 13 6 20 14 18 5 11 3 --127 --75
-	// 20	19	18	17	16	15	14	13	12	11	10	9	8	7	6	5	4	3	2	1
 
-	if (ac > 6)
-		push_swap(ac, av);
-	else if (ac > 3 && ac <= 6)
+	if (ac == 6)
 		simple_sort(ac, av);
+	else if (ac > 3 && ac != 6)
+		push_swap(ac, av);
 	else if (ac == 3 && ft_atoi(av[1]) > ft_atoi(av[2]))
 		printf("%s\n", "sa");
 	return (0);
