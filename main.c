@@ -30,29 +30,32 @@ void print(t_lst *tmp)
 	printf("\n");
 }
 
-int	ft_atoi(const char *str)
+void print_coast(t_lst *heada)
 {
-	int		i;
-	int		sign;
-	size_t	rez;
-
-	i = 0;
-	sign = 1;
-	rez = 0;
-	while (str[i] == ' ' || (str[i] >= 8 && str[i] <= 13))
-		i++;
-	if ((str[i] == '-' || str[i] == '+') && str[i + 1] >= '0'
-	&& str[i + 1] <= '9')
-		sign = -1 * (str[i++] - 44);
-	while (str[i] >= '0' && str[i] <= '9')
+	if (heada->here == 1)
 	{
-		if (rez > 922337203685477580)
-			return ((1 + sign) / -2);
-		if (rez == 922337203685477580 && str[i] - 48 > 8 + (1 + sign) / -2)
-			return ((1 + sign) / -2);
-		rez = rez * 10 + (str[i++] - '0');
+		printf("%d->\t", heada->num);
+		printf("ra: %d\t", heada->ra);
+		printf("rb: %d\t", heada->rb);
+		printf("rr: %d\t", heada->rr);
+		printf("rra: %d\t", heada->rra);
+		printf("rrb: %d\t", heada->rrb);
+		printf("rrr: %d\t\n", heada->rrr);
 	}
-	return ((int)rez * sign);
+	while (heada->next && heada->next->ishead != 1)
+	{
+		heada = heada->next;
+		if (heada->here == 1)
+		{
+			printf("%d->\t", heada->num);
+			printf("ra: %d\t", heada->ra);
+			printf("rb: %d\t", heada->rb);
+			printf("rr: %d\t", heada->rr);
+			printf("rra: %d\t", heada->rra);
+			printf("rrb: %d\t", heada->rrb);
+			printf("rrr: %d\t\n", heada->rrr);
+		}
+	}
 }
 
 t_lst	*create_list(int num, int ishead)
@@ -119,7 +122,8 @@ void dosort(t_lst *head, int flag, int len)
 	//printf("%d--\n", i);
 	while (i > 0)
 	{
-		printf("%s%s\n", s, flag == 0 ? "a" : "b");
+		ft_putstr(s);
+		ft_putendl(flag == 0 ? "a" : "b");
 		i--;
 	}
 }
@@ -156,32 +160,20 @@ int maxint(t_lst *head)
 	return (max);
 }
 
-void print_coast(t_lst *heada)
+int maxint2(t_lst *head)
 {
-	if (heada->here == 1)
+	t_lst	*tmp;
+	int		max;
+
+	tmp = head;
+	max = head->num;
+	while (tmp->next && tmp->next->ishead != 1)
 	{
-		printf("%d->\t", heada->num);
-		printf("ra: %d\t", heada->ra);
-		printf("rb: %d\t", heada->rb);
-		printf("rr: %d\t", heada->rr);
-		printf("rra: %d\t", heada->rra);
-		printf("rrb: %d\t", heada->rrb);
-		printf("rrr: %d\t\n", heada->rrr);
+		tmp = tmp->next;
+		if (max < tmp->num && tmp->num != maxint(head))
+			max = tmp->num;
 	}
-	while (heada->next && heada->next->ishead != 1)
-	{
-		heada = heada->next;
-		if (heada->here == 1)
-		{
-			printf("%d->\t", heada->num);
-			printf("ra: %d\t", heada->ra);
-			printf("rb: %d\t", heada->rb);
-			printf("rr: %d\t", heada->rr);
-			printf("rra: %d\t", heada->rra);
-			printf("rrb: %d\t", heada->rrb);
-			printf("rrr: %d\t\n", heada->rrr);
-		}
-	}
+	return (max);
 }
 
 int find_rb(int num, t_lst *headb)
@@ -307,7 +299,8 @@ t_lst *find_cheap(t_lst *h)
 	while (h->next && h->next->ishead != 1)
 	{
 		h = h->next;
-		if (min > h->ra + h->rb + h->rr + h->rra + h->rrb + h->rrr && h->here == 1)
+		if (min > h->ra + h->rb + h->rr + h->rra + h->rrb + h->rrr
+			&& h->here == 1)
 		{
 			min = h->ra + h->rb + h->rr + h->rra + h->rrb + h->rrr;
 			it = h;
@@ -326,7 +319,7 @@ void rr_ab(t_lst **head, int flag)
 	while ((*head)->prev->num != n && (*head)->here == 0)
 		(*head) = (*head)->prev;
 	(*head)->ishead = 1;
-	printf("%s\n", flag == 0 ? "rra" : "rrb");
+	ft_putendl(flag == 0 ? "rra" : "rrb");
 }
 
 void r_ab(t_lst **head, int flag)
@@ -339,7 +332,7 @@ void r_ab(t_lst **head, int flag)
 	while ((*head)->next->num != n && (*head)->here == 0)
 		(*head) = (*head)->next;
 	(*head)->ishead = 1;
-	printf("%s\n", flag == 0 ? "ra" : "rb");
+	ft_putendl(flag == 0 ? "ra" : "rb");
 }
 
 void rr(t_lst **heada, t_lst **headb)
@@ -359,7 +352,7 @@ void rr(t_lst **heada, t_lst **headb)
 	while ((*headb)->next->num != nb && (*headb)->here == 0)
 		(*headb) = (*headb)->next;
 	(*headb)->ishead = 1;
-	printf("%s\n", "rr");
+	ft_putendl("rr");
 }
 
 void rrr(t_lst **heada, t_lst **headb)
@@ -379,7 +372,7 @@ void rrr(t_lst **heada, t_lst **headb)
 	while ((*headb)->prev->num != nb && (*headb)->here == 0)
 		(*headb) = (*headb)->prev;
 	(*headb)->ishead = 1;
-	printf("%s\n", "rrr");
+	ft_putendl("rrr");
 }
 
 void p_ab(t_lst **heada, t_lst **headb)
@@ -404,7 +397,7 @@ void p_ab(t_lst **heada, t_lst **headb)
 		}
 		lst = lst->next;
 	}
-	printf("%s\n", "pb");
+	ft_putendl("pb");
 }
 
 void zero_coast(t_lst *h)
@@ -440,7 +433,7 @@ void ft_throw(int n)
 
 	i = -1;
 	while (++i < n)
-		printf("%s\n", "pa");
+		ft_putendl("pa");
 }
 
 t_lst	*sort_list(t_lst* lst, int (*cmp)(int, int))
@@ -508,7 +501,7 @@ void del_stack(t_lst **head, int n)
 	}
 }
 
-void push_swap(int ac, char **av)
+void push_swap(int ac, char **av, int flag)
 {
 	t_lst *heada;
 	t_lst *headb;
@@ -520,7 +513,7 @@ void push_swap(int ac, char **av)
 	p_ab(&heada, &headb);
 	// print(heada);
 	// print(headb);
-	i = ac - 3;
+	i = flag == 0 ? ac - 3 : ac - 5;
 	while (i > 0)
 	{
 		coast_r(heada, headb);
@@ -541,101 +534,96 @@ void push_swap(int ac, char **av)
 
 t_lst *rr_aorb(t_lst *head, int flag)
 {
-    head->ishead = 0;
-    head = head->prev;
-    head->ishead = 1;
-    printf("%s\n", flag == 0 ? "rra" : "rrb");
-    return (head);
+	head->ishead = 0;
+	head = head->prev;
+	head->ishead = 1;
+	ft_putendl(flag == 0 ? "rra" : "rrb");
+	return (head);
 }
 
 t_lst *r_aorb(t_lst *head, int flag)
 {
-    head->ishead = 0;
-    head = head->next;
-    head->ishead = 1;
-    printf("%s\n", flag == 0 ? "ra" : "rb");
-    return (head);
+	head->ishead = 0;
+	head = head->next;
+	head->ishead = 1;
+	ft_putendl(flag == 0 ? "ra" : "rb");
+	return (head);
 }
 
 t_lst *s_aorb(t_lst *head, int flag)
 {
-    int t;
+	int t;
 
-    t = 0;
-    t = head->num;
-    head->num = head->next->num;
-    head->next->num = t;
-    printf("%s\n", flag == 0 ? "sa" : "sb");
-    return (head);
+	t = 0;
+	t = head->num;
+	head->num = head->next->num;
+	head->next->num = t;
+	ft_putendl(flag == 0 ? "sa" : "sb");
+	return (head);
 }
 
 int		check(t_lst *head, int min, int len)
 {
-    t_lst	*tmp;
-    int		i;
+	t_lst	*tmp;
+	int		i;
 
-    tmp = head;
-    i = 1;
-    if (!head->next)
-        return (0);
-    while (tmp->num != min)
-        tmp = tmp->next;
-    while (1)
-    {
-        if (tmp->num > tmp->next->num)
-            break ;
-        tmp = tmp->next;
-        i++;
-        if (i == len)
-            return (0);
-    }
-    return (1);
+	tmp = head;
+	i = 1;
+	if (!head->next)
+		return (0);
+	while (tmp->num != min)
+		tmp = tmp->next;
+	while (1)
+	{
+		if (tmp->num > tmp->next->num)
+			break ;
+		tmp = tmp->next;
+		i++;
+		if (i == len)
+			return (0);
+	}
+	return (1);
 }
 
 t_lst *del_list(t_lst *h)
 {
-	t_lst *tmp;
 	t_lst *next;
 	t_lst *prev;
 
-	printf("%s\n", "pb");
-	(h)->ishead = 0;
+	ft_putendl("pb");
 	next = (h)->next;
 	prev = (h)->prev;
-	h = (h)->next;
-	h->ishead = 1;
 	next->prev = prev;
 	prev->next = next;
-	free(tmp);
-	return (h);
+	next->ishead = 1;
+	free(h);
+	return (next);
 }
 
-int sort(t_lst *h, int len)
+int sort(t_lst **h, int len, int max1, int max2)
 {
 	int i;
+	int flag;
 
-	i = 0;
-	while (check(h, minint(h), len))
+	i = flag = 0;
+	while (check(*h, minint(*h), len))
 	{
-		if (h->num == maxint(h) && i++ < 2)
+		if (((*h)->num == max1 || (*h)->num == max2) && i++ < 2 && len-- > 3)
 		{
-			len = len - 1;
-			h = del_list(h);
+			flag = (*h)->num == max2 ? flag * 0 : flag + 1;
+			(*h) = del_list(*h);
 		}
 		else
 		{
-			if ((h)->num > (h)->next->num && (h)->next->num != minint(h))
-				(h) = s_aorb((h), 0);
-			if (check(h, minint(h), len))
-			{
-				if ((h)->num < (h)->prev->num && (h)->num != minint(h))
-					(h) = rr_aorb((h), 0);
-				else
-					(h) = r_aorb((h), 0);
-			}
+			if ((*h)->num > (*h)->next->num && (*h)->next->num != minint(*h))
+				(*h) = s_aorb((*h), 0);
+			if (check(*h, minint(*h), len))
+				*h = ((*h)->num < (*h)->prev->num && (*h)->num != minint(*h)) ?
+				rr_aorb((*h), 0) : r_aorb((*h), 0);
 		}
 	}
-	dosort(h, 0, len);
+	dosort(*h, 0, len);
+	ft_putstr(flag == 1 ? "sb\n" : "");
 	return (i);
 }
 
@@ -656,22 +644,65 @@ void simple_sort(int ac, char **av)
 		lst = lst->next;
 		lst->here = 1;
 	}
-	i = sort(heada, ac - 1);
-	//del_stack(&heada, ac - i - 1);
+	i = sort(&heada, ac - 1, maxint(heada), maxint2(heada));
+	del_stack(&heada, ac - 1 - i);
 	while (i-- > 0)
-		printf("%s\n%s\n", "pa", "ra");
+		ft_putstr("pa\nra\n");
+}
+
+void del_split(char **s, int n)
+{
+	int i;
+
+	i = 0;
+	while (i <= n)
+	{
+		free(s[i]);
+		i++;
+	}
+	free(s);
+}
+
+void do_split(const char *s)
+{
+	char **av;
+	char *t[1000];
+	int i;
+
+	i = 0;
+	t[0] = "toto";
+	av = ft_strsplit(s, ' ');
+	while (av[i])
+	{
+		//printf("%s\n", av[i]);
+		t[i + 1] = av[i];
+		i++;
+	}
+	t[i + 1] = 0;
+	if (i == 1)
+		return ;
+	else
+		main(i + 1, t);
+	del_split(av, i);
 }
 
 int main(int ac, char **av)
 {
 	// 10 3 4 5 9 -2 13 0 6 11 8 -5 -3 -99 1000 18 -11 --58
 	// 16 12 17 10 7 9 1 19 8 4 2 15 13 6 20 14 18 5 11 3 --127 --75
-
-	if (ac == 6)
+	// int i;
+	//
+	// i = 0;
+	// while (++i < ac)
+	// 	printf("%s ", av[i]);
+	// printf("\n");
+	if (ac == 2)
+		do_split(av[1]);
+	else if (ac == 6)
 		simple_sort(ac, av);
 	else if (ac > 3 && ac != 6)
-		push_swap(ac, av);
+		push_swap(ac, av, 0);
 	else if (ac == 3 && ft_atoi(av[1]) > ft_atoi(av[2]))
-		printf("%s\n", "sa");
+		ft_putendl("sa");
 	return (0);
 }

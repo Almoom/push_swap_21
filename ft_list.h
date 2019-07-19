@@ -15,6 +15,7 @@
 # include <string.h>
 # include <stdlib.h>
 # include <stdio.h>
+# include "libft/libft.h"
 
 typedef struct		s_lst
 {
@@ -30,19 +31,20 @@ typedef struct		s_lst
 	int				rrb;
 	int				rrr;
 }					t_lst;
-typedef struct		s_list
-{
-	struct s_list	*prev;
-	struct s_list	*next;
-	int				num;
-	int				ishead;
-	int				len;
-}					t_list;
-typedef struct		s_l
-{
-	struct s_l		*next;
-	int				num;
-}					t_l;
+// typedef struct		s_list
+// {
+// 	struct s_list	*prev;
+// 	struct s_list	*next;
+// 	int				num;
+// 	int				ishead;
+// 	int				len;
+// }					t_list;
+// typedef struct		s_l
+// {
+// 	struct s_l		*next;
+// 	int				num;
+// }					t_l;
 int					maxint(t_lst *head);
 int					minint(t_lst *head);
+int					main(int ac, char **av);
 #endif
