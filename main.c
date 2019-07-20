@@ -462,27 +462,42 @@ int ascending(int a, int b)
 	return (a > b);
 }
 
-void create_both(t_lst **heada, t_lst **headb, int ac, char **av)
+void ft_here(t_lst *h)
 {
-	int i;
-	int (*cmd)(int, int);
 	t_lst *lst;
 
-	i = 0;
-	cmd = &ascending;
-	while (++i < ac)
-	{
-		*heada = create_stake(*heada, ft_atoi(av[i]));
-		*headb = create_stake(*headb, ft_atoi(av[i]));
-	}
-	sort_list(*headb, cmd);
-	lst = *heada;
+	lst = h;
 	lst->here = 1;
 	while (lst->next && lst->next->ishead != 1)
 	{
 		lst = lst->next;
 		lst->here = 1;
 	}
+}
+
+int create_both(t_lst **heada, t_lst **headb, int ac, char **av)
+{
+	int i;
+	int (*cmd)(int, int);
+
+
+	i = 0;
+	cmd = &ascending;
+	while (++i < ac)
+	{
+		if (ft_notvalid(av[i]))
+		{
+			ft_putendl("Error");
+			del_stack(heada, i - 1);
+			del_stack(headb, i - 1);
+			return (0);
+		}
+		*heada = create_stake(*heada, ft_atoi(av[i]));
+		*headb = create_stake(*headb, ft_atoi(av[i]));
+	}
+	sort_list(*headb, cmd);
+	ft_here(*heada);
+	return (1);
 }
 
 void del_stack(t_lst **head, int n)
@@ -501,35 +516,31 @@ void del_stack(t_lst **head, int n)
 	}
 }
 
-void push_swap(int ac, char **av, int flag)
+void push_swap(int ac, char **av)
 {
 	t_lst *heada;
 	t_lst *headb;
 	int i;
 
 	heada = headb = NULL;
-	create_both(&heada, &headb, ac, av);
-	p_ab(&heada, &headb);
-	p_ab(&heada, &headb);
-	// print(heada);
-	// print(headb);
-	i = flag == 0 ? ac - 3 : ac - 5;
-	while (i > 0)
+	if (create_both(&heada, &headb, ac, av))
 	{
-		coast_r(heada, headb);
-		coast_rr(heada, headb);
-		coast_rez(heada);
-		//print_coast(heada);
-		driver(find_cheap(heada), &heada, &headb);
-		zero_coast(heada);
-		// print(heada);
-		// print(headb);
-		i--;
+		p_ab(&heada, &headb);
+		p_ab(&heada, &headb);
+		i = ac - 2;
+		while (--i > 0)
+		{
+			coast_r(heada, headb);
+			coast_rr(heada, headb);
+			coast_rez(heada);
+			driver(find_cheap(heada), &heada, &headb);
+			zero_coast(heada);
+		}
+		dosort(headb, 1, ac - 1);
+		ft_throw(ac - 1);
+		del_stack(&heada, ac - 1);
+		del_stack(&headb, ac - 1);
 	}
-	dosort(headb, 1, ac - 1);
-	ft_throw(ac - 1);
-	del_stack(&heada, ac - 1);
-	del_stack(&headb, ac - 1);
 }
 
 t_lst *rr_aorb(t_lst *head, int flag)
@@ -600,34 +611,36 @@ t_lst *del_list(t_lst *h)
 	return (next);
 }
 
-int sort(t_lst **h, int len, int max1, int max2)
+int sort(t_lst **h, int l, int z, int f)
 {
 	int i;
 	int flag;
+	int y;
 
 	i = flag = 0;
-	while (check(*h, minint(*h), len))
+	y = maxint2(*h);
+	while (check(*h, minint(*h), l))
 	{
-		if (((*h)->num == max1 || (*h)->num == max2) && i++ < 2 && len-- > 3)
+		if (f == 1 && ((*h)->num == z || (*h)->num == y) && i++ < 2 && l-- > 3)
 		{
-			flag = (*h)->num == max2 ? flag * 0 : flag + 1;
+			flag = (*h)->num == y ? flag * 0 : flag + 1;
 			(*h) = del_list(*h);
 		}
 		else
 		{
 			if ((*h)->num > (*h)->next->num && (*h)->next->num != minint(*h))
 				(*h) = s_aorb((*h), 0);
-			if (check(*h, minint(*h), len))
+			if (check(*h, minint(*h), l))
 				*h = ((*h)->num < (*h)->prev->num && (*h)->num != minint(*h)) ?
 				rr_aorb((*h), 0) : r_aorb((*h), 0);
 		}
 	}
-	dosort(*h, 0, len);
+	dosort(*h, 0, l);
 	ft_putstr(flag == 1 ? "sb\n" : "");
 	return (i);
 }
 
-void simple_sort(int ac, char **av)
+void simple_sort(int ac, char **av, int flag)
 {
 	t_lst *heada;
 	t_lst *lst;
@@ -636,15 +649,17 @@ void simple_sort(int ac, char **av)
 	i = 0;
 	heada = lst = NULL;
 	while (++i < ac)
-		heada = create_stake(heada, ft_atoi(av[i]));
-	lst = heada;
-	lst->here = 1;
-	while (lst->next && lst->next->ishead != 1)
 	{
-		lst = lst->next;
-		lst->here = 1;
+		if (ft_notvalid(av[i]))
+		{
+			ft_putendl("Error");
+			del_stack(&heada, i - 1);
+			return ;
+		}
+		heada = create_stake(heada, ft_atoi(av[i]));
 	}
-	i = sort(&heada, ac - 1, maxint(heada), maxint2(heada));
+	//ft_here(heada);
+	i = sort(&heada, ac - 1, maxint(heada), flag);
 	del_stack(&heada, ac - 1 - i);
 	while (i-- > 0)
 		ft_putstr("pa\nra\n");
@@ -669,14 +684,18 @@ void do_split(const char *s)
 	char *t[1000];
 	int i;
 
-	i = 0;
-	t[0] = "toto";
+	i = -1;
+	t[0] = "42";
 	av = ft_strsplit(s, ' ');
-	while (av[i])
+	while (av[++i])
 	{
-		//printf("%s\n", av[i]);
+		if (ft_notvalid(av[i]))
+		{
+			ft_putendl("Error");
+			del_split(av, i);
+			return ;
+		}
 		t[i + 1] = av[i];
-		i++;
 	}
 	t[i + 1] = 0;
 	if (i == 1)
@@ -684,6 +703,22 @@ void do_split(const char *s)
 	else
 		main(i + 1, t);
 	del_split(av, i);
+}
+
+int ft_notvalid(char *s)
+{
+	int i;
+
+	i = 0;
+	while (s[i])
+	{
+		if (i == 0 && s[i] != '-' && s[i] != '+' && !ft_isdigit(s[i]))
+			return (1);
+		if (i > 0 && !ft_isdigit(s[i]))
+			return (1);
+		i++;
+	}
+	return (0);
 }
 
 int main(int ac, char **av)
@@ -698,11 +733,18 @@ int main(int ac, char **av)
 	// printf("\n");
 	if (ac == 2)
 		do_split(av[1]);
+	else if (ac > 3 && ac < 6)
+		simple_sort(ac, av, 0);
 	else if (ac == 6)
-		simple_sort(ac, av);
-	else if (ac > 3 && ac != 6)
-		push_swap(ac, av, 0);
-	else if (ac == 3 && ft_atoi(av[1]) > ft_atoi(av[2]))
-		ft_putendl("sa");
+		simple_sort(ac, av, 1);
+	else if (ac > 6)
+		push_swap(ac, av);
+	else if (ac == 3)
+	{
+		if (ft_notvalid(av[1]) || ft_notvalid(av[2]))
+			ft_putendl("Error");
+		else if (ft_atoi(av[1]) > ft_atoi(av[2]))
+			ft_putendl("sa");
+	}
 	return (0);
 }

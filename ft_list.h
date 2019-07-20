@@ -47,4 +47,6 @@ typedef struct		s_lst
 int					maxint(t_lst *head);
 int					minint(t_lst *head);
 int					main(int ac, char **av);
+int					ft_notvalid(char *s);
+void 				del_stack(t_lst **head, int n);
 #endif
