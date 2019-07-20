@@ -46,7 +46,9 @@ typedef struct		s_lst
 // }					t_l;
 int					maxint(t_lst *head);
 int					minint(t_lst *head);
-int					main(int ac, char **av);
+void				do_split(const char *s);
 int					ft_notvalid(char *s);
 void 				del_stack(t_lst **head, int n);
+t_lst				*create_stake(t_lst *head, int n);
+t_lst				*create_list(int num, int ishead);
 #endif

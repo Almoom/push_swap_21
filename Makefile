@@ -13,9 +13,13 @@
 CC = gcc
 
 NAME = a.out
+NAME2 = checker2
 
 make:
-	@$(CC) -o $(NAME) *.c /Users/ljalikak/Documents/push_swap_21/libft/libft.a
+	@$(CC) -o $(NAME) main.c /Users/ljalikak/Documents/push_swap_21/libft/libft.a
+
+make2:
+	@$(CC) -o $(NAME2) main2.c /Users/ljalikak/Documents/push_swap_21/libft/libft.a
 
 clean:
 	@rm -f /Users/ljalikak/Documents/push_swap_21/libft/*.o

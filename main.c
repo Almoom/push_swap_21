@@ -643,11 +643,10 @@ int sort(t_lst **h, int l, int z, int f)
 void simple_sort(int ac, char **av, int flag)
 {
 	t_lst *heada;
-	t_lst *lst;
 	int i;
 
 	i = 0;
-	heada = lst = NULL;
+	heada = NULL;
 	while (++i < ac)
 	{
 		if (ft_notvalid(av[i]))
@@ -676,33 +675,6 @@ void del_split(char **s, int n)
 		i++;
 	}
 	free(s);
-}
-
-void do_split(const char *s)
-{
-	char **av;
-	char *t[1000];
-	int i;
-
-	i = -1;
-	t[0] = "42";
-	av = ft_strsplit(s, ' ');
-	while (av[++i])
-	{
-		if (ft_notvalid(av[i]))
-		{
-			ft_putendl("Error");
-			del_split(av, i);
-			return ;
-		}
-		t[i + 1] = av[i];
-	}
-	t[i + 1] = 0;
-	if (i == 1)
-		return ;
-	else
-		main(i + 1, t);
-	del_split(av, i);
 }
 
 int ft_notvalid(char *s)
@@ -747,4 +719,31 @@ int main(int ac, char **av)
 			ft_putendl("sa");
 	}
 	return (0);
+}
+
+void do_split(const char *s)
+{
+	char **av;
+	char *t[1000];
+	int i;
+
+	i = -1;
+	t[0] = "42";
+	av = ft_strsplit(s, ' ');
+	while (av[++i])
+	{
+		if (ft_notvalid(av[i]))
+		{
+			ft_putendl("Error");
+			del_split(av, i);
+			return ;
+		}
+		t[i + 1] = av[i];
+	}
+	t[i + 1] = 0;
+	if (i == 1)
+		return ;
+	else
+		main(i + 1, t);
+	del_split(av, i);
 }
