@@ -19,12 +19,12 @@ void print(t_lst *tmp)
 		printf("%s\n", "NULL");
 		return ;
 	}
-	if (tmp->here == 1)
+	//if (tmp->here == 1)
 		printf("%d\t", tmp->num);
 	while (tmp->next && tmp->next->ishead != 1)
 	{
 		tmp = tmp->next;
-		if (tmp->here == 1)
+		//if (tmp->here == 1)
 			printf("%d\t", tmp->num);
 	}
 	printf("\n");
@@ -128,16 +128,160 @@ void del_split(char **s, int n)
 	free(s);
 }
 
-void reader(t_lst **head)
+void ft_rab(t_lst **head)
+{
+	if (!(*head) || !(*head)->next)
+		return ;
+	(*head)->ishead = 0;
+	(*head) = (*head)->next;
+	(*head)->ishead = 1;
+}
+
+void ft_rr(t_lst **heada, t_lst **headb)
+{
+	ft_rab(heada);
+	ft_rab(headb);
+}
+
+void ft_rrab(t_lst **head)
+{
+	if (!(*head) || !(*head)->prev)
+		return ;
+	(*head)->ishead = 0;
+	(*head) = (*head)->prev;
+	(*head)->ishead = 1;
+}
+
+void ft_rrr(t_lst **heada, t_lst **headb)
+{
+	ft_rrab(heada);
+	ft_rrab(headb);
+}
+
+void ft_sab(t_lst **head)
+{
+	int t;
+
+
+	if (!(*head) || !(*head)->next)
+		return ;
+	t = (*head)->num;
+	(*head)->num = (*head)->next->num;
+	(*head)->next->num = t;
+}
+
+void ft_ss(t_lst **heada, t_lst **headb)
+{
+	ft_sab(heada);
+	ft_sab(headb);
+}
+
+t_lst *ft_dellist(t_lst *h)
+{
+	t_lst *next;
+	t_lst *prev;
+
+	next = prev = NULL;
+	if (!h)
+		return (NULL);
+	if ((h)->next && (h)->next == (h)->prev)
+	{
+		next = (h)->next;
+		next->ishead = 1;
+		next->next = NULL;
+		next->prev = NULL;
+	}
+	else if ((h)->next && (h)->prev)
+	{
+		next = (h)->next;
+		prev = (h)->prev;
+		next->prev = prev;
+		prev->next = next;
+		next->ishead = 1;
+
+	}
+	free(h);
+	h = NULL;
+	return (next);
+}
+
+void list_before(t_lst **head, int n)
+{
+	t_lst *list;
+
+	list = NULL;
+	if (!head)
+		list = create_list(n, 1);
+	else
+	{
+		list = create_list(n, 1);
+		head->ishead = 0;
+		if (head->prev && head->next)
+		{
+			head->prev->next = list;
+			list->prev = head->prev;
+			list->next = head;
+			head->prev = list;
+		}
+		else
+		{
+			list->next = head;
+			list->prev = head;
+			head->next = list;
+			head->prev = list;
+		}
+	}
+	return (list);
+}
+
+void ft_p(t_lst **from, t_lst **to)
+{
+	if (!(*from))
+		return ;
+	list_add(to, (*from)->num);
+	*from = ft_dellist(*from);
+}
+
+void ft_build(t_lst **heada, t_lst **headb, char *s)
+{
+	if (!ft_strcmp(s, "ra"))
+		ft_rab(heada);
+	if (!ft_strcmp(s, "rb"))
+		ft_rab(headb);
+	if (!ft_strcmp(s, "rr"))
+		ft_rr(heada, headb);
+	if (!ft_strcmp(s, "rra"))
+		ft_rrab(heada);
+	if (!ft_strcmp(s, "rrb"))
+		ft_rrab(headb);
+	if (!ft_strcmp(s, "rrr"))
+		ft_rrr(heada, headb);
+	if (!ft_strcmp(s, "sa"))
+		ft_sab(heada);
+	if (!ft_strcmp(s, "sb"))
+		ft_sab(headb);
+	if (!ft_strcmp(s, "ss"))
+		ft_ss(heada, headb);
+	if (!ft_strcmp(s, "pb"))
+		ft_p(heada, headb);
+	if (!ft_strcmp(s, "pa"))
+		ft_p(headb, heada);
+	print(*heada);
+	print(*headb);
+}
+
+void reader(t_lst **heada)
 {
 	char *arr;
+	t_lst *headb;
 
 	arr = NULL;
+	headb = NULL;
 	while (ft_get_next_line(0, &arr))
 	{
 		if (ft_valid_op(arr))
 		{
-			ft_putendl("go");//////////////////////////////////////////////////////////
+			ft_build(heada, &headb, arr);
 			ft_memdel((void**)(&arr));
 		}
 		else

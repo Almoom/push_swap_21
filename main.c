@@ -565,7 +565,6 @@ t_lst *s_aorb(t_lst *head, int flag)
 {
 	int t;
 
-	t = 0;
 	t = head->num;
 	head->num = head->next->num;
 	head->next->num = t;
