@@ -37,7 +37,8 @@ int ft_notvalid(char *s)
 	i = 0;
 	while (s[i])
 	{
-		if (i == 0 && s[i] != '-' && s[i] != '+' && !ft_isdigit(s[i]))
+		if (s[i + 1] && i == 0 && (s[i] == '-' || s[i] == '+') &&
+		!ft_isdigit(s[i + 1]))
 			return (1);
 		if (i > 0 && !ft_isdigit(s[i]))
 			return (1);
@@ -114,6 +115,19 @@ int ft_valid_op(char *s)
 	return (0);
 }
 
+void del_split(char **s, int n)
+{
+	int i;
+
+	i = 0;
+	while (i < n)
+	{
+		free(s[i]);
+		i++;
+	}
+	free(s);
+}
+
 void reader(t_lst **head)
 {
 	char *arr;
@@ -124,7 +138,7 @@ void reader(t_lst **head)
 		if (ft_valid_op(arr))
 		{
 			ft_putendl("go");//////////////////////////////////////////////////////////
-			free(arr);
+			ft_memdel((void**)(&arr));
 		}
 		else
 		{
@@ -132,12 +146,11 @@ void reader(t_lst **head)
 			break;
 		}
 	}
-	free(arr);
+	ft_memdel((void**)(&arr));
 }
 
-int main(int ac, char **av)
+void checker(int ac, char **av)
 {
-
 	t_lst *heada;
 	int i;
 
@@ -145,15 +158,104 @@ int main(int ac, char **av)
 	heada = NULL;
 	while (++i < ac)
 	{
-		if (ft_notvalid(av[i]))
+		if (ft_notvalid(av[i]) || !ft_isint(av[i]))
 		{
 			ft_putendl("Error");
 			del_stack(&heada, i - 1);
-			return (0);
+			return ;
 		}
 		heada = create_stake(heada, ft_atoi(av[i]));
 	}
 	reader(&heada);
 	del_stack(&heada, ac - 1);
+}
+
+int ft_isint2(char *s, int n, int len, int minus)
+{
+	int i;
+
+	i = 0;
+	while (i < n)
+	{
+		s++;
+		i++;
+	}
+	if (len < 10)
+		return (1);
+	if (len == 10)
+	{
+		if (minus && ft_strcmp(s, "2147483648") <= 0)
+			return (1);
+		if (!minus && ft_strcmp(s, "2147483647") <= 0)
+			return (1);
+	}
 	return (0);
+}
+
+int ft_isint(char *s)
+{
+	int i;
+	int j;
+	int flag;
+	int minus;
+
+	i = j = flag = minus = 0;
+	while (s[i])
+	{
+		if (i == 0 && s[i] == '-')
+			minus = 1;
+		if (i == 0 && (s[i] == '-' || s[i] == '+') && !ft_isdigit(s[i + 1]))
+			i++;
+		while (s[i] == '0' && flag == 0)
+			i++;
+		if (ft_isdigit(s[i]))
+		{
+			flag = 1;
+			j++;
+		}
+		i++;
+	}
+	return (ft_isint2(s, i - j, j, minus));
+}
+
+int main(int ac, char **av)
+{
+	// 10 3 4 5 9 -2 13 0 6 11 8 -5 -3 -99 1000 18 -11 --58
+	// 16 12 17 10 7 9 1 19 8 4 2 15 13 6 20 14 18 5 11 3 --127 --75
+
+	if (ac == 2)
+		do_split(av[1]);
+	else if (ac > 2)
+		checker(ac, av);
+
+	return (0);
+}
+
+void do_split(const char *s)
+{
+	char **av;
+	char *t[10000];
+	int i;
+
+	i = -1;
+	t[0] = "42";
+	if (!ft_strchr(s, ' '))
+		return ;
+	av = ft_strsplit(s, ' ');
+	while (av[++i])
+	{
+		if (ft_notvalid(av[i]) || !ft_isint(av[i]))
+		{
+			ft_putendl("Error");
+			del_split(av, i);
+			return ;
+		}
+		t[i + 1] = av[i];
+	}
+	t[i + 1] = 0;
+	if (i == 1)
+		return ;
+	else
+		main(i + 1, t);
+	del_split(av, i);
 }

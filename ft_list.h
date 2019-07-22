@@ -51,4 +51,6 @@ int					ft_notvalid(char *s);
 void 				del_stack(t_lst **head, int n);
 t_lst				*create_stake(t_lst *head, int n);
 t_lst				*create_list(int num, int ishead);
+int					ft_isint(char *s);
+int					ft_isint2(char *s, int n, int len, int minus);
 #endif
