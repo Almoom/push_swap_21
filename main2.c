@@ -205,7 +205,7 @@ t_lst *ft_dellist(t_lst *h)
 	return (next);
 }
 
-void list_before(t_lst **head, int n)
+t_lst *list_before(t_lst *head, int n)
 {
 	t_lst *list;
 
@@ -238,7 +238,7 @@ void ft_p(t_lst **from, t_lst **to)
 {
 	if (!(*from))
 		return ;
-	list_add(to, (*from)->num);
+	*to = list_before(*to, (*from)->num);
 	*from = ft_dellist(*from);
 }
 
