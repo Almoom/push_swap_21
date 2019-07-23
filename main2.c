@@ -266,11 +266,12 @@ void ft_build(t_lst **heada, t_lst **headb, char *s)
 		ft_p(heada, headb);
 	if (!ft_strcmp(s, "pa"))
 		ft_p(headb, heada);
-	print(*heada);
-	print(*headb);
+	// printf("%s\n", s);
+	// print(*heada);
+	// print(*headb);
 }
 
-void reader(t_lst **heada)
+int reader(t_lst **heada)
 {
 	char *arr;
 	t_lst *headb;
@@ -287,10 +288,31 @@ void reader(t_lst **heada)
 		else
 		{
 			ft_putendl("Error");
-			break;
+			ft_memdel((void**)(&arr));
+			return (1);
 		}
 	}
 	ft_memdel((void**)(&arr));
+	return (0);
+}
+
+void ft_solve(t_lst *heada)
+{
+	int n;
+
+	n = heada->num;
+	while (heada->next && heada->next->ishead != 1)
+	{
+		heada = heada->next;
+		if (n < heada->num)
+			n = heada->num;
+		else
+		{
+			ft_putendl("KO");
+			return ;
+		}
+	}
+	ft_putendl("OK");
 }
 
 void checker(int ac, char **av)
@@ -310,7 +332,8 @@ void checker(int ac, char **av)
 		}
 		heada = create_stake(heada, ft_atoi(av[i]));
 	}
-	reader(&heada);
+	if (!reader(&heada))
+		ft_solve(heada);
 	del_stack(&heada, ac - 1);
 }
 
@@ -348,6 +371,8 @@ int ft_isint(char *s)
 	{
 		if (i == 0 && s[i] == '-')
 			minus = 1;
+		if (i == 0 && (s[i] == '-' || s[i] == '+') && !s[i + 1])
+			return (0);
 		if (i == 0 && (s[i] == '-' || s[i] == '+') && !ft_isdigit(s[i + 1]))
 			i++;
 		while (s[i] == '0' && flag == 0)
@@ -391,7 +416,7 @@ void do_split(const char *s)
 		if (ft_notvalid(av[i]) || !ft_isint(av[i]))
 		{
 			ft_putendl("Error");
-			del_split(av, i);
+			del_split(av, i + 1);
 			return ;
 		}
 		t[i + 1] = av[i];

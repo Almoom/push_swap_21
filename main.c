@@ -727,6 +727,8 @@ int ft_isint(char *s)
 	{
 		if (i == 0 && s[i] == '-')
 			minus = 1;
+		if (i == 0 && (s[i] == '-' || s[i] == '+') && !s[i + 1])
+			return (0);
 		if (i == 0 && (s[i] == '-' || s[i] == '+') && !ft_isdigit(s[i + 1]))
 			i++;
 		while (s[i] == '0' && flag == 0)
@@ -761,7 +763,8 @@ int main(int ac, char **av)
 		push_swap(ac, av);
 	else if (ac == 3)
 	{
-		if (ft_notvalid(av[1]) || ft_notvalid(av[2]))
+		if (ft_notvalid(av[1]) || ft_notvalid(av[2])|| !ft_isint(av[1])
+		|| !ft_isint(av[2]))
 			ft_putendl("Error");
 		else if (ft_atoi(av[1]) > ft_atoi(av[2]))
 			ft_putendl("sa");

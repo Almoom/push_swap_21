@@ -12,8 +12,8 @@
 
 CC = gcc
 
-NAME = a.out
-NAME2 = checker2
+NAME = push_swap
+NAME2 = checker
 
 make:
 	@$(CC) -o $(NAME) main.c /Users/ljalikak/Documents/push_swap_21/libft/libft.a
