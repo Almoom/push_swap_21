@@ -12,6 +12,94 @@
 
 #include "ft_list.h"
 
+void print(t_lst *tmp)
+{
+	if (!tmp)
+	{
+		printf("%s\n", "NULL");
+		return ;
+	}
+	if (tmp->here == 1)
+		printf("%d\t", tmp->num);
+	while (tmp->next && tmp->next->ishead != 1)
+	{
+		tmp = tmp->next;
+		if (tmp->here == 1)
+			printf("%d\t", tmp->num);
+	}
+	printf("\n");
+}
+
+void print_coast(t_lst *heada)
+{
+	if (heada->here == 1)
+	{
+		printf("%d->\t", heada->num);
+		printf("ra: %d\t", heada->ra);
+		printf("rb: %d\t", heada->rb);
+		printf("rr: %d\t", heada->rr);
+		printf("rra: %d\t", heada->rra);
+		printf("rrb: %d\t", heada->rrb);
+		printf("rrr: %d\t\n", heada->rrr);
+	}
+	while (heada->next && heada->next->ishead != 1)
+	{
+		heada = heada->next;
+		if (heada->here == 1)
+		{
+			printf("%d->\t", heada->num);
+			printf("ra: %d\t", heada->ra);
+			printf("rb: %d\t", heada->rb);
+			printf("rr: %d\t", heada->rr);
+			printf("rra: %d\t", heada->rra);
+			printf("rrb: %d\t", heada->rrb);
+			printf("rrr: %d\t\n", heada->rrr);
+		}
+	}
+}
+
+t_lst	*create_list(int num, int ishead)
+{
+	t_lst *list;
+
+	if (!(list = (t_lst*)malloc(sizeof(*list))))
+		return (NULL);
+	list->num = num;
+	list->ishead = ishead;
+	list->here = 0;
+	list->prev = NULL;
+	list->next = NULL;
+	list->ra = 0;
+	list->rb = 0;
+    list->rr = 0;
+    list->rrb = 0;
+    list->rra = 0;
+    list->rrr = 0;
+	return (list);
+}
+
+t_lst *create_stake(t_lst *head, int n)
+{
+	t_lst *tmp;
+	t_lst *list;
+
+	list = NULL;
+	tmp = head;
+	if (!head)
+		head = create_list(n, 1);
+	else
+	{
+		while (tmp->next && tmp->next->ishead != 1)
+			tmp = tmp->next;
+		list = create_list(n, 0);
+		tmp->next = list;
+		list->prev = tmp;
+		list->next = head;
+		head->prev = list;
+	}
+	return (head);
+}
+
 void dosort(t_lst *head, int flag, int len)
 {
 	int		i;
@@ -354,8 +442,6 @@ t_lst	*sort_list(t_lst* lst, int (*cmp)(int, int))
 	int swap;
 
 	tmp = lst;
-	if (!lst)
-		return (NULL);
 	while (lst->next && lst->next->ishead != 1)
 	{
 		if (!cmp(lst->num, lst->next->num))
@@ -399,8 +485,7 @@ int create_both(t_lst **heada, t_lst **headb, int ac, char **av)
 	cmd = &ascending;
 	while (++i < ac)
 	{
-		if (ft_notvalid(av[i]) || !ft_isint(av[i])
-		|| ft_intdupl(*heada, ft_atoi(av[i])))
+		if (ft_notvalid(av[i]))
 		{
 			ft_putendl("Error");
 			del_stack(heada);
@@ -415,12 +500,41 @@ int create_both(t_lst **heada, t_lst **headb, int ac, char **av)
 	return (1);
 }
 
+int ft_lenstack(t_lst *h)
+{
+	int i;
+
+	i = 1;
+	while (h->next && h->next->ishead != 1)
+	{
+		h = h->next;
+		i++;
+	}
+	return (i);
+}
+
+void del_stack(t_lst **head)
+{
+	t_lst *t;
+	int i;
+	int len;
+
+	len = ft_lenstack(*head);
+	t = NULL;
+	i = 0;
+	while (i < len)
+	{
+		t = (*head)->next;
+		free(*head);
+		*head = t;
+		i++;
+	}
+}
+
 int solver(t_lst *heada)
 {
 	int n;
 
-	if (!heada)
-		return (1);
 	n = heada->num;
 	while (heada->next && heada->next->ishead != 1)
 	{
@@ -565,8 +679,7 @@ void simple_sort(int ac, char **av, int flag)
 	heada = NULL;
 	while (++i < ac)
 	{
-		if (ft_notvalid(av[i]) || !ft_isint(av[i])
-		|| ft_intdupl(heada, ft_atoi(av[i])))
+		if (ft_notvalid(av[i]))
 		{
 			ft_putendl("Error");
 			del_stack(&heada);
@@ -574,10 +687,108 @@ void simple_sort(int ac, char **av, int flag)
 		}
 		heada = create_stake(heada, ft_atoi(av[i]));
 	}
+	//ft_here(heada);
 	i = sort(&heada, ac - 1, maxint(heada), flag);
 	del_stack(&heada);
 	while (i-- > 0)
 		ft_putstr("pa\nra\n");
+}
+
+void del_split(char **s)
+{
+	int i;
+
+	i = 0;
+	while (s[i])
+	{
+		free(s[i]);
+		i++;
+	}
+	free(s);
+}
+
+int ft_notvalid(char *s)
+{
+	int i;
+
+	i = 0;
+	if (!s[1] && !ft_isdigit(s[0]))
+		return (1);
+	while (s[i])
+	{
+		if (s[i + 1] && (s[i] == '-' || s[i] == '+') && ft_isdigit(s[i + 1]))
+			i++;
+		if (!ft_isdigit(s[i]) && s[i] != ' ')
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
+int ft_isint2(char *s, int n, int len, int minus)
+{
+	int i;
+
+	i = 0;
+	while (i < n)
+	{
+		s++;
+		i++;
+	}
+	if (len < 10)
+		return (1);
+	if (len == 10)
+	{
+		if (minus && ft_strcmp(s, "2147483648") <= 0)
+			return (1);
+		if (!minus && ft_strcmp(s, "2147483647") <= 0)
+			return (1);
+	}
+	return (0);
+}
+
+int ft_isint(char *s)
+{
+	int i;
+	int j;
+	int flag;
+	int minus;
+
+	i = j = flag = minus = 0;
+	while (s[i])
+	{
+		//printf("%s", s);
+		if (i == 0 && s[i] == '-')
+			minus = 1;
+		if (i == 0 && (s[i] == '-' || s[i] == '+') && !ft_isdigit(s[i + 1]))
+			i++;
+		while (s[i] == '0' && flag == 0)
+			i++;
+		if (!s[i])
+			return (1);
+		if (ft_isdigit(s[i]))
+		{
+			flag = 1;
+			j++;
+		}
+		i++;
+	}
+	return (ft_isint2(s, i - j, j, minus));
+}
+
+int ft_strdupl(char **av, char *s, int n)
+{
+	int i;
+
+	i = 1;
+	while (i < n)
+	{
+		//printf("%s--%s\n", av[i], s);
+		if (!ft_strcmp(av[i], s))
+			return (1);
+		i++;
+	}
+	return (0);
 }
 
 int main(int ac, char **av)

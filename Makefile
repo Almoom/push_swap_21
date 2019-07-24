@@ -16,10 +16,10 @@ NAME = push_swap
 NAME2 = checker
 
 make:
-	@$(CC) -o $(NAME) main.c /Users/ljalikak/Documents/push_swap_21/libft/libft.a
+	@$(CC) -o $(NAME) main.c common_valid.c common_born_kill_stack.c /Users/ljalikak/Documents/push_swap_21/libft/libft.a
 
 make2:
-	@$(CC) -o $(NAME2) main2.c /Users/ljalikak/Documents/push_swap_21/libft/libft.a
+	@$(CC) -o $(NAME2) checker.c common_valid.c common_born_kill_stack.c checker2.c checker3.c checker4.c /Users/ljalikak/Documents/push_swap_21/libft/libft.a
 
 clean:
 	@rm -f /Users/ljalikak/Documents/push_swap_21/libft/*.o
