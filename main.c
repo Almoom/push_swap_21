@@ -488,8 +488,8 @@ int create_both(t_lst **heada, t_lst **headb, int ac, char **av)
 		if (ft_notvalid(av[i]))
 		{
 			ft_putendl("Error");
-			del_stack(heada, i - 1);
-			del_stack(headb, i - 1);
+			del_stack(heada);
+			del_stack(headb);
 			return (0);
 		}
 		*heada = create_stake(*heada, ft_atoi(av[i]));
@@ -500,20 +500,51 @@ int create_both(t_lst **heada, t_lst **headb, int ac, char **av)
 	return (1);
 }
 
-void del_stack(t_lst **head, int n)
+int ft_lenstack(t_lst *h)
+{
+	int i;
+
+	i = 1;
+	while (h->next && h->next->ishead != 1)
+	{
+		h = h->next;
+		i++;
+	}
+	return (i);
+}
+
+void del_stack(t_lst **head)
 {
 	t_lst *t;
 	int i;
+	int len;
 
+	len = ft_lenstack(*head);
 	t = NULL;
 	i = 0;
-	while (i < n)
+	while (i < len)
 	{
 		t = (*head)->next;
 		free(*head);
 		*head = t;
 		i++;
 	}
+}
+
+int solver(t_lst *heada)
+{
+	int n;
+
+	n = heada->num;
+	while (heada->next && heada->next->ishead != 1)
+	{
+		heada = heada->next;
+		if (n < heada->num)
+			n = heada->num;
+		else
+			return (0);
+	}
+	return (1);
 }
 
 void push_swap(int ac, char **av)
@@ -525,6 +556,8 @@ void push_swap(int ac, char **av)
 	heada = headb = NULL;
 	if (create_both(&heada, &headb, ac, av))
 	{
+		if (solver(heada))
+			return ;
 		p_ab(&heada, &headb);
 		p_ab(&heada, &headb);
 		i = ac - 2;
@@ -538,8 +571,8 @@ void push_swap(int ac, char **av)
 		}
 		dosort(headb, 1, ac - 1);
 		ft_throw(ac - 1);
-		del_stack(&heada, ac - 1);
-		del_stack(&headb, ac - 1);
+		del_stack(&heada);
+		del_stack(&headb);
 	}
 }
 
@@ -651,14 +684,14 @@ void simple_sort(int ac, char **av, int flag)
 		if (ft_notvalid(av[i]))
 		{
 			ft_putendl("Error");
-			del_stack(&heada, i - 1);
+			del_stack(&heada);
 			return ;
 		}
 		heada = create_stake(heada, ft_atoi(av[i]));
 	}
 	//ft_here(heada);
 	i = sort(&heada, ac - 1, maxint(heada), flag);
-	del_stack(&heada, ac - 1 - i);
+	del_stack(&heada);
 	while (i-- > 0)
 		ft_putstr("pa\nra\n");
 }
@@ -772,7 +805,7 @@ int main(int ac, char **av)
 	return (0);
 }
 
-void do_split(const char *s)
+void do_split(char *s)
 {
 	char **av;
 	char *t[10000];

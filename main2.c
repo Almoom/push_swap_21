@@ -47,14 +47,31 @@ int ft_notvalid(char *s)
 	return (0);
 }
 
-void del_stack(t_lst **head, int n)
+int ft_lenstack(t_lst *h)
+{
+	int i;
+
+	i = 1;
+	while (h->next && h->next->ishead != 1)
+	{
+		h = h->next;
+		i++;
+	}
+	return (i);
+}
+
+void del_stack(t_lst **head)
 {
 	t_lst *t;
 	int i;
+	int len;
 
+	if (!(*head))
+		return ;
+	len = ft_lenstack(*head);
 	t = NULL;
 	i = 0;
-	while (i < n)
+	while (i < len)
 	{
 		t = (*head)->next;
 		free(*head);
@@ -271,18 +288,16 @@ void ft_build(t_lst **heada, t_lst **headb, char *s)
 	// print(*headb);
 }
 
-int reader(t_lst **heada)
+int reader(t_lst **heada, t_lst **headb)
 {
 	char *arr;
-	t_lst *headb;
 
 	arr = NULL;
-	headb = NULL;
 	while (ft_get_next_line(0, &arr))
 	{
 		if (ft_valid_op(arr))
 		{
-			ft_build(heada, &headb, arr);
+			ft_build(heada, headb, arr);
 			ft_memdel((void**)(&arr));
 		}
 		else
@@ -296,11 +311,16 @@ int reader(t_lst **heada)
 	return (0);
 }
 
-void ft_solve(t_lst *heada)
+void ft_solve(t_lst *heada, t_lst *headb)
 {
 	int n;
 
 	n = heada->num;
+	if (headb)
+	{
+		ft_putendl("KO");
+		return ;
+	}
 	while (heada->next && heada->next->ishead != 1)
 	{
 		heada = heada->next;
@@ -315,26 +335,45 @@ void ft_solve(t_lst *heada)
 	ft_putendl("OK");
 }
 
+int ft_dupl(t_lst *h, int n)
+{
+	if (!h)
+		return (0);
+	if (n == h->num)
+		return (1);
+	while (h->next && h->next->ishead != 1)
+	{
+		h = h->next;
+		if (n == h->num)
+			return (1);
+	}
+	return (0);
+}
+
 void checker(int ac, char **av)
 {
 	t_lst *heada;
+	t_lst *headb;
 	int i;
 
 	i = 0;
-	heada = NULL;
+	heada = headb = NULL;
 	while (++i < ac)
 	{
-		if (ft_notvalid(av[i]) || !ft_isint(av[i]))
+		if (ft_notvalid(av[i]) || !ft_isint(av[i]) || ft_dupl(heada, ft_atoi(av[i])))
 		{
 			ft_putendl("Error");
-			del_stack(&heada, i - 1);
+			del_stack(&heada);
 			return ;
 		}
 		heada = create_stake(heada, ft_atoi(av[i]));
 	}
-	if (!reader(&heada))
-		ft_solve(heada);
-	del_stack(&heada, ac - 1);
+	if (!reader(&heada, &headb))
+	{
+		ft_solve(heada, headb);
+	}
+	del_stack(&heada);
+	del_stack(&headb);
 }
 
 int ft_isint2(char *s, int n, int len, int minus)
@@ -400,7 +439,7 @@ int main(int ac, char **av)
 	return (0);
 }
 
-void do_split(const char *s)
+void do_split(char *s)
 {
 	char **av;
 	char *t[10000];
@@ -408,12 +447,10 @@ void do_split(const char *s)
 
 	i = -1;
 	t[0] = "42";
-	if (!ft_strchr(s, ' '))
-		return ;
 	av = ft_strsplit(s, ' ');
 	while (av[++i])
 	{
-		if (ft_notvalid(av[i]) || !ft_isint(av[i]))
+		if (ft_notvalid(av[i]) || !ft_isint(av[i]) || !ft_strchr(s, ' '))
 		{
 			ft_putendl("Error");
 			del_split(av, i + 1);
