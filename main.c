@@ -554,10 +554,8 @@ void push_swap(int ac, char **av)
 	int i;
 
 	heada = headb = NULL;
-	if (create_both(&heada, &headb, ac, av))
+	if (create_both(&heada, &headb, ac, av) && !solver(heada))
 	{
-		if (solver(heada))
-			return ;
 		p_ab(&heada, &headb);
 		p_ab(&heada, &headb);
 		i = ac - 2;
@@ -571,9 +569,9 @@ void push_swap(int ac, char **av)
 		}
 		dosort(headb, 1, ac - 1);
 		ft_throw(ac - 1);
-		del_stack(&heada);
-		del_stack(&headb);
 	}
+	del_stack(&heada);
+	del_stack(&headb);
 }
 
 t_lst *rr_aorb(t_lst *head, int flag)
@@ -696,12 +694,12 @@ void simple_sort(int ac, char **av, int flag)
 		ft_putstr("pa\nra\n");
 }
 
-void del_split(char **s, int n)
+void del_split(char **s)
 {
 	int i;
 
 	i = 0;
-	while (i < n)
+	while (s[i])
 	{
 		free(s[i]);
 		i++;
@@ -714,12 +712,13 @@ int ft_notvalid(char *s)
 	int i;
 
 	i = 0;
+	if (!s[1] && !ft_isdigit(s[0]))
+		return (1);
 	while (s[i])
 	{
-		if (s[i + 1] && i == 0 && (s[i] == '-' || s[i] == '+')
-		&& !ft_isdigit(s[i + 1]))
-			return (1);
-		if (i > 0 && !ft_isdigit(s[i]))
+		if (s[i + 1] && (s[i] == '-' || s[i] == '+') && ft_isdigit(s[i + 1]))
+			i++;
+		if (!ft_isdigit(s[i]) && s[i] != ' ')
 			return (1);
 		i++;
 	}
@@ -758,14 +757,15 @@ int ft_isint(char *s)
 	i = j = flag = minus = 0;
 	while (s[i])
 	{
+		//printf("%s", s);
 		if (i == 0 && s[i] == '-')
 			minus = 1;
-		if (i == 0 && (s[i] == '-' || s[i] == '+') && !s[i + 1])
-			return (0);
 		if (i == 0 && (s[i] == '-' || s[i] == '+') && !ft_isdigit(s[i + 1]))
 			i++;
 		while (s[i] == '0' && flag == 0)
 			i++;
+		if (!s[i])
+			return (1);
 		if (ft_isdigit(s[i]))
 		{
 			flag = 1;
@@ -774,6 +774,21 @@ int ft_isint(char *s)
 		i++;
 	}
 	return (ft_isint2(s, i - j, j, minus));
+}
+
+int ft_strdupl(char **av, char *s, int n)
+{
+	int i;
+
+	i = 1;
+	while (i < n)
+	{
+		//printf("%s--%s\n", av[i], s);
+		if (!ft_strcmp(av[i], s))
+			return (1);
+		i++;
+	}
+	return (0);
 }
 
 int main(int ac, char **av)
@@ -786,7 +801,20 @@ int main(int ac, char **av)
 	// while (++i < ac)
 	// 	printf("%s ", av[i]);
 	// printf("\n");
-	if (ac == 2)
+	int i;
+
+	i = 1;
+	while (av[i] && ac > 2)
+	{
+		if (ft_notvalid(av[i]) || !ft_isint(av[i]) || ft_strdupl(av, av[i], i))
+		{
+			//printf("%d--%d--%d\n", ft_notvalid(av[i]), !ft_isint(av[i]), ft_strdupl(av, av[i], i));
+			ft_putendl("Error");
+			return (0);
+		}
+		i++;
+	}
+	if (ac == 2 && ft_strchr(av[1], ' '))
 		do_split(av[1]);
 	else if (ac > 3 && ac < 6)
 		simple_sort(ac, av, 0);
@@ -794,14 +822,8 @@ int main(int ac, char **av)
 		simple_sort(ac, av, 1);
 	else if (ac > 6)
 		push_swap(ac, av);
-	else if (ac == 3)
-	{
-		if (ft_notvalid(av[1]) || ft_notvalid(av[2])|| !ft_isint(av[1])
-		|| !ft_isint(av[2]))
-			ft_putendl("Error");
-		else if (ft_atoi(av[1]) > ft_atoi(av[2]))
-			ft_putendl("sa");
-	}
+	else if (ac == 3 && ft_atoi(av[1]) > ft_atoi(av[2]))
+		ft_putendl("sa");
 	return (0);
 }
 
@@ -812,24 +834,24 @@ void do_split(char *s)
 	int i;
 
 	i = -1;
-	t[0] = "42";
-	if (!ft_strchr(s, ' '))
+	if (!ft_strcmp(s, " "))
+	{
+		ft_putendl("Error");
 		return ;
+	}
 	av = ft_strsplit(s, ' ');
 	while (av[++i])
 	{
-		if (ft_notvalid(av[i]) || !ft_isint(av[i]))
+		if (ft_notvalid(av[i]) || !ft_isint(av[i]) || ft_strdupl(av, av[i], i))
 		{
 			ft_putendl("Error");
-			del_split(av, i);
+			del_split(av);
 			return ;
 		}
 		t[i + 1] = av[i];
 	}
 	t[i + 1] = 0;
-	if (i == 1)
-		return ;
-	else
+	if (i > 1)
 		main(i + 1, t);
-	del_split(av, i);
+	del_split(av);
 }

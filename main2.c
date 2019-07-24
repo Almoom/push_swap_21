@@ -35,12 +35,13 @@ int ft_notvalid(char *s)
 	int i;
 
 	i = 0;
+	if (!s[1] && !ft_isdigit(s[0]))
+		return (1);
 	while (s[i])
 	{
-		if (s[i + 1] && i == 0 && (s[i] == '-' || s[i] == '+') &&
-		!ft_isdigit(s[i + 1]))
-			return (1);
-		if (i > 0 && !ft_isdigit(s[i]))
+		if (s[i + 1] && (s[i] == '-' || s[i] == '+') && ft_isdigit(s[i + 1]))
+			i++;
+		if (!ft_isdigit(s[i]) && s[i] != ' ')
 			return (1);
 		i++;
 	}
@@ -360,7 +361,8 @@ void checker(int ac, char **av)
 	heada = headb = NULL;
 	while (++i < ac)
 	{
-		if (ft_notvalid(av[i]) || !ft_isint(av[i]) || ft_dupl(heada, ft_atoi(av[i])))
+		if (ft_notvalid(av[i]) || !ft_isint(av[i])
+		|| ft_dupl(heada, ft_atoi(av[i])))
 		{
 			ft_putendl("Error");
 			del_stack(&heada);
@@ -410,12 +412,12 @@ int ft_isint(char *s)
 	{
 		if (i == 0 && s[i] == '-')
 			minus = 1;
-		if (i == 0 && (s[i] == '-' || s[i] == '+') && !s[i + 1])
-			return (0);
 		if (i == 0 && (s[i] == '-' || s[i] == '+') && !ft_isdigit(s[i + 1]))
 			i++;
 		while (s[i] == '0' && flag == 0)
 			i++;
+		if (!s[i])
+			return (1);
 		if (ft_isdigit(s[i]))
 		{
 			flag = 1;
@@ -426,11 +428,38 @@ int ft_isint(char *s)
 	return (ft_isint2(s, i - j, j, minus));
 }
 
+int ft_strdupl(char **av, char *s, int n)
+{
+	int i;
+
+	i = 1;
+	while (i < n)
+	{
+		//printf("%s--%s\n", av[i], s);
+		if (!ft_strcmp(av[i], s))
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
 int main(int ac, char **av)
 {
 	// 10 3 4 5 9 -2 13 0 6 11 8 -5 -3 -99 1000 18 -11 --58
 	// 16 12 17 10 7 9 1 19 8 4 2 15 13 6 20 14 18 5 11 3 --127 --75
+	int i;
 
+	i = 1;
+	while (av[i] && ac > 2)
+	{
+		if (ft_notvalid(av[i]) || !ft_isint(av[i]) || ft_strdupl(av, av[i], i))
+		{
+			//printf("%d--%d--%d\n", ft_notvalid(av[i]), !ft_isint(av[i]), ft_strdupl(av, av[i], i));
+			ft_putendl("Error");
+			return (0);
+		}
+		i++;
+	}
 	if (ac == 2)
 		do_split(av[1]);
 	else if (ac > 2)
@@ -446,11 +475,15 @@ void do_split(char *s)
 	int i;
 
 	i = -1;
-	t[0] = "42";
+	if (!ft_strcmp(s, " "))
+	{
+		ft_putendl("Error");
+		return ;
+	}
 	av = ft_strsplit(s, ' ');
 	while (av[++i])
 	{
-		if (ft_notvalid(av[i]) || !ft_isint(av[i]) || !ft_strchr(s, ' '))
+		if (ft_notvalid(av[i]) || !ft_isint(av[i]))
 		{
 			ft_putendl("Error");
 			del_split(av, i + 1);
@@ -459,9 +492,7 @@ void do_split(char *s)
 		t[i + 1] = av[i];
 	}
 	t[i + 1] = 0;
-	if (i == 1)
-		return ;
-	else
+	if (i > 1)
 		main(i + 1, t);
 	del_split(av, i);
 }
