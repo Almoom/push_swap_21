@@ -102,13 +102,13 @@ int		main(int ac, char **av)
 		i++;
 	}
 	if (ac == 2)
-		do_split(av[1]);
+		do_split2(av[1]);
 	else if (ac > 2)
 		checker(ac, av);
 	return (0);
 }
 
-void	do_split(char *s)
+void	do_split2(char *s)
 {
 	char	**av;
 	char	*t[10000];

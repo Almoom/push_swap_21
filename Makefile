@@ -11,20 +11,60 @@
 # **************************************************************************** #
 
 CC = gcc
+CFLAGS = -Wall -Wextra -Werror
+CHECKER = checker
+PUSHSWAP = push_swap
+LIB = $(LIBSRC)libft.a
+HEADER = ./includes/
+LIBSRC = ./libft/
+SRC1 = ./sources/
+SRC2 = common_valid.c \
+common_born_kill_stack.c \
+push_swap.c \
+push_swap2.c \
+push_swap3.c \
+push_swap4.c \
+push_swap5.c \
+push_swap6.c \
+push_swap7.c
+SRC3 = common_valid.c \
+common_born_kill_stack.c \
+checker.c \
+checker2.c \
+checker3.c \
+checker4.c
 
-NAME = push_swap
-NAME2 = checker
+OBJS2 = $(SRC2:.c=.o)
+OBJS3 = $(SRC3:.c=.o)
 
-make:
-	@$(CC) -o $(NAME) main.c common_valid.c common_born_kill_stack.c /Users/ljalikak/Documents/push_swap_21/libft/libft.a
+.PHONY: clean all fclean re
 
-make2:
-	@$(CC) -o $(NAME2) checker.c common_valid.c common_born_kill_stack.c checker2.c checker3.c checker4.c /Users/ljalikak/Documents/push_swap_21/libft/libft.a
+all: $(CHECKER) $(PUSHSWAP)
+
+$(CHECKER): $(LIB) $(OBJS3) $(CHECKER).o
+	$(CC) $(CFLAGS) -o $@ $^
+
+$(PUSHSWAP): $(LIB) $(OBJS2) $(PUSHSWAP).o
+	$(CC) $(CFLAGS) -o $(PUSHSWAP) $(OBJS2) $(LIB)
+
+$(LIB):
+	@make lib_refresh
+
+%.o: $(SRC1)%.c
+	$(CC) $(CFLAGS) -c $< -I $(HEADER) -I $(LIBSRC)
+
+lib_refresh:
+	make -C $(LIBSRC)
+
+norm:
+	norminette -R CheckForbiddenSourceHeader
 
 clean:
-	@rm -f /Users/ljalikak/Documents/push_swap_21/libft/*.o
+	rm -rf $(OBJS3) $(OBJS2) 
+	@make -C $(LIBSRC) clean
 
 fclean: clean
-	@rm -f *.out
+	@rm -rf $(PUSHSWAP) $(CHECKER)
+	make -C $(LIBSRC) fclean
 
 re: fclean all

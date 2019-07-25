@@ -15,7 +15,7 @@
 # include <string.h>
 # include <stdlib.h>
 # include <stdio.h>
-# include "libft/libft.h"
+# include "libft.h"
 
 typedef struct		s_lst
 {
@@ -53,6 +53,67 @@ t_lst				*create_stake(t_lst *head, int n);
 void				del_split(char **s);
 
 /*
+**	push_swap2.c
+*/
+
+int					find_rb(int num, t_lst *headb);
+void				coast_r(t_lst *heada, t_lst *headb);
+int					find_rrb(int num, t_lst *headb);
+void				coast_rr(t_lst *heada, t_lst *headb);
+void				coast_rez(t_lst *h);
+
+/*
+**	push_swap3.c
+*/
+
+t_lst				*find_cheap(t_lst *h);
+void				three_zero(t_lst *h, int flag);
+int					maxint(t_lst *head);
+int					maxint2(t_lst *head);
+int					minint(t_lst *head);
+
+/*
+**	push_swap4.c
+*/
+
+void				rr_ab(t_lst **head, int flag);
+void				r_ab(t_lst **head, int flag);
+void				rr(t_lst **heada, t_lst **headb);
+void				rrr(t_lst **heada, t_lst **headb);
+void				p_ab(t_lst **heada, t_lst **headb);
+
+/*
+**	push_swap5.c
+*/
+
+void				zero_coast(t_lst *h);
+void				driver(t_lst *min, t_lst **heada, t_lst **headb);
+void				ft_throw(int n);
+void				ft_here(t_lst *h);
+int					solver(t_lst *heada);
+
+/*
+**	push_swap6.c
+*/
+
+t_lst				*rr_aorb(t_lst *head, int flag);
+t_lst				*r_aorb(t_lst *head, int flag);
+t_lst				*s_aorb(t_lst *head, int flag);
+t_lst				*sort_list(t_lst *lst, int (*cmp)(int, int));
+int					ascending(int a, int b);
+
+/*
+**	push_swap7.c
+*/
+
+int					create_both
+					(t_lst **heada, t_lst **headb, int ac, char **av);
+t_lst				*del_list(t_lst *h);
+int					sort(t_lst **h, int l, int z, int f);
+void				simple_sort(int ac, char **av, int flag);
+void				spasi_i_sohrani(t_lst *h, int l, int flag);
+
+/*
 **	checker2.c
 */
 
@@ -78,11 +139,8 @@ int					ft_valid_op(char *s);
 t_lst				*ft_dellist(t_lst *h);
 t_lst				*list_before(t_lst *head, int n);
 
-
-
+int					check(t_lst *head, int min, int len);
+void				dosort(t_lst *head, int flag, int len);
 void				do_split(char *s);
-int					maxint(t_lst *head);
-int					minint(t_lst *head);
-
-
+void				do_split2(char *s);
 #endif
